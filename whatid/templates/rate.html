@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="action_box">
+    <form action="/rate" method="POST" enctype="multipart/form-data">
+    <fieldset>
+
+        <h2>Rate</h2>
+
+        <p>If you have used this service to match your string to a type of identifer, please let us know what you think of it.</p>
+        <p>Provide a score for the identifier method that was used, to let us know its' accuracy; future requests for that 
+        type of identifier will use the highest scoring available method.</p>
+
+        <div class="clearfix">
+        <label for="identifier">Which sort of identifier did you try to match?</label>
+        <div class="input">
+        <select name="regex">
+            <option>regex1</option>
+        </select>
+        <span class="help-block">
+        e.g. a DOI.
+        </span>
+        </div>
+        </div>
+
+        <div class="clearfix">
+        <label for="regex">Which method was used?</label>
+        <div class="input">
+        <select name="regex">
+            <option>regex1</option>
+        </select>
+        <span class="help-block">
+        (The method ID used would have been listed in your result data.)
+        </span>
+        </div>
+        </div>
+
+        <div class="clearfix">
+        <label for="rate">Rate out of 10</label>
+        <div class="input">
+        <input class="span6" type="text" name="rate" />
+        <span class="help-block">
+        Give it a score based on how accurate the response was. e.g. 10/10 for spot on, 0/10 for total nonsense.
+        </span>
+        </div>
+        </div>
+
+        <div class="clearfix">
+        <label for="comment">Further comment</label>
+        <div class="input">
+        <textarea class="span6" name="comment"></textarea>
+        <span class="help-block">
+        Anything else to point out?
+        </span>
+        </div>
+        </div>
+
+        <div class="clearfix">
+        <label for="submit">&nbsp;</label>
+        <div class="input"><input class="btn primary span6" type="submit" name="submit" value="submit" /></div>
+        </div>
+
+    </fieldset>
+    </form>
+</div>
+{% endblock %}
+

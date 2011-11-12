@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+      <div class="hero-unit">
+        <form action="/identify" method="POST" enctype="multipart/form-data">
+        <input class="frontin" type="text" value="/^(WhatID).*?$/" />
+        </form>
+        <p>Got an ID? Not sure what it is? What you can do with it? Just paste above and hit enter!</p>
+      </div>
+
+      <div class="row">
+        <div class="span4 column info">
+          <div class="alert-message block-message info">
+          <h2>Identify</h3>
+          <p>You got a string, it looks like some sort of identifer, but which is it?</p>
+          <p><a href="/identify" class="btn">Identify &raquo;</a></p>
+          </div>
+        </div>
+        <div class="span4 column">
+          <div class="alert-message block-message info">
+          <h2>Parse</h2>
+          <p>You got some text, and there may be an identifier in it. But where?</p>
+          <p><a href="/parse" class="btn">Parse &raquo;</a></p>
+          </div>
+        </div>
+        <div class="span4 column">
+          <div class="alert-message block-message info">
+          <h2>Submit</h2>
+          <p>You have a method for identifying identifiers - tell us about it</p>
+          <p><a href="/submit" class="btn">Submit &raquo;</a></p>
+          </div>
+        </div>
+        <div class="span4 column">
+          <div class="alert-message block-message info">
+          <h2>Rate</h2>
+          <p>You used the service - now rate the quality of the response</p>
+          <p><a href="/rate" class="btn">Rate &raquo;</a></p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="container">
+      <div class="well">
+      <p>latest stuff</p>
+      </div>
+      </div>
+{% endblock %}
