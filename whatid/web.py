@@ -119,9 +119,9 @@ def identify():
     #  },
     #  ...
     #]
-    qs = request.query_string
     if request.method == "GET":
-        resp = make_response( whatid.dao.Record.raw_query(qs) )
+        return render_template('identify.html')
+
     if request.method == "POST":
         qs += "&source=" + json.dumps(dict(request.form).keys()[-1])
         resp = make_response( whatid.dao.Record.raw_query(qs) )

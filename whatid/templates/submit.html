@@ -2,79 +2,17 @@
 
 {% block content %}
 <div class="action_box">
-    <form action="/submit" method="POST" enctype="multipart/form-data">
+    <form action="/identify" method="POST" enctype="multipart/form-data">
     <fieldset>
 
-        <h2>Submit</h2>
+        <h2>Identify</h2>
 
-        <p>This service works on a collection of identifier descriptions and a collection of methods for identifying identifiers.</p>
-        <p>These collections are built up from community submissions.</p>
-
-        <div class="clearfix">
-        <label for="type">Submit</label>
-        <div class="input">
-        <ul class="inputs-list">
-            <li>
-                <label>
-                <input type="radio" name="type" value="regex" />
-                <span>Identifier method</span>
-                </label>
-            </li>
-            <li>
-                <label>
-                <input type="radio" name="type" value="identifier" />
-                <span>Identifier description</span>
-                </label>
-            </li>
-        </ul>
-        <span class="help-block">
-        Learn more about <a href="/content/regex">methods</a> and <a href="/content/identifier">descriptions</a>
-        </span>
-        </div>
-        </div>
-
-
+        <p>Submit an identifier and we will try to tell you what it is.</p>
 
         <div class="clearfix">
-        <label for="regex">Regular expression</label>
+        <label for="regex">String</label>
         <div class="input">
-        <input class="span6" type="text" name="regex" />
-        <span class="help-block">
-        A pythonic <a href="/content/regex">regular expression</a> that will match the identifier
-        </span>
-        </div>
-        </div>
-
-        <div class="clearfix">
-        <label for="url">URL</label>
-        <div class="input">
-            <input class="span4" type="text" name="url" />
-            <input class="span2" type="text" name="suffix" />
-        <span class="help-block">
-        The <a href="/content/url">main URL</a> to which this type of identifier could be submitted. 
-        <br />(And any <a href="/content/urlsuffix">URL suffix</a> that may be required, 
-        for example if the identifier has to slot into the middle of a URL.)
-        </span>
-        </div>
-        </div>
-
-        <div class="clearfix">
-        <label for="description">Description</label>
-        <div class="input">
-        <textarea class="span6" name="description"></textarea>
-        <span class="help-block">
-        A simple short description about the identifier.
-        </span>
-        </div>
-        </div>
-
-        <div class="clearfix">
-        <label for="tags">Tags</label>
-        <div class="input">
-        <input class="span6" type="text" name="tags" />
-        <span class="help-block">
-        Any <a href="/content/tags">tag words</a> that describe this identifier or its' function. Separate by commas.
-        </span>
+        <input class="span6" type="text" name="string" />
         </div>
         </div>
 
