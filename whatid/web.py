@@ -159,7 +159,8 @@ class RateView(MethodView):
     def post(self):
         if not auth.collection.create(current_user, None):
             abort(401)
-        whatid.importer.rate(request)
+        importer = whatid.importer.Importer(owner=current_user,requesturl=request.host_url)
+        importer.rate(request)
         flash('Successfully received your rating')
         return redirect('/account/%s/' % current_user.id)
 
@@ -182,7 +183,8 @@ class SubmitView(MethodView):
         if not auth.collection.create(current_user, None):
             abort(401)
         if 'type' in request.values:
-            whatid.importer.submit(request)
+            importer = whatid.importer.Importer(owner=current_user,requesturl=request.host_url)
+            importer.submit(request)
             flash('Successfully received %s' % request.values.get("type"))
             return redirect('/account/%s/' % current_user.id)
         else:
