@@ -1,7 +1,7 @@
 import os
 from flask import Flask
 
-from bibserver import default_settings
+from whatid import default_settings
 from flaskext.login import LoginManager, current_user
 login_manager = LoginManager()
 

@@ -1,4 +1,4 @@
-from bibserver.core import current_user
+from whatid.core import current_user
 
 def read(account, collection):
     return True

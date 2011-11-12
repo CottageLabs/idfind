@@ -104,7 +104,7 @@ class Importer(object):
         :return: (collection, records) tuple of collection and associated
         record objects.
         '''
-        collection = bibserver.dao.Collection(**collection_dict)
+        collection = whatid.dao.Collection(**collection_dict)
         timestamp = datetime.now().isoformat()
         collection['created'] = timestamp
         assert 'label' in collection, 'Collection must have a label'
@@ -118,7 +118,7 @@ class Importer(object):
                 if coll['source'] == collection['source']:
                     if coll['id'] != collection['id']:
                         delid = coll['id']
-                        bibserver.dao.Collection.delete_by_query('id:' + coll['id'])
+                        whatid.dao.Collection.delete_by_query('id:' + coll['id'])
                         break
                     else:
                         collection = coll
@@ -127,7 +127,7 @@ class Importer(object):
                 collection = coll
                 break
 
-        bibserver.dao.Record.delete_by_query('collection'+config["facet_field"]+':"' + delid + '"')
+        whatid.dao.Record.delete_by_query('collection'+config["facet_field"]+':"' + delid + '"')
 
         collection['records'] = len(record_dicts)
         collection['modified'] = timestamp
@@ -149,7 +149,7 @@ class Importer(object):
                     rec['url'] += collection['id'] + '/' + rec.get('citekey')
                 else:
                     rec['url'] += rec['id']
-        records = bibserver.dao.Record.bulk_upsert(record_dicts)
+        records = whatid.dao.Record.bulk_upsert(record_dicts)
         return collection, records
 
 
@@ -180,24 +180,24 @@ class Importer(object):
     
     def do_person(self,person_string):
         try:
-            results = bibserver.dao.Record.query(q='type.exact:"person" AND alias.exact:"' + person_string + '"')
+            results = whatid.dao.Record.query(q='type.exact:"person" AND alias.exact:"' + person_string + '"')
             if results["hits"]["total"] != 0:
                 return results["hits"]["hits"][0]["_source"]["person"]
 
-            looseresults = bibserver.dao.Record.query(q='type.exact:"person" AND "*' + person_string + '*"',flt=True,fields=["person"])
+            looseresults = whatid.dao.Record.query(q='type.exact:"person" AND "*' + person_string + '*"',flt=True,fields=["person"])
             if looseresults["hits"]["total"] != 0:
                 tid = looseresults["hits"]["hits"][0]["_id"]
-                data = bibserver.dao.Record.get(tid)
+                data = whatid.dao.Record.get(tid)
                 if "alias" in data:
                     if person_string not in data["alias"]:
                         data["alias"].append(person_string)
-                bibserver.dao.Record.upsert(data)
+                whatid.dao.Record.upsert(data)
 
                 return data["person"]
 
             ident = person_string.replace(" ","").replace(",","").replace(".","")
             data = {"person":ident,"type":"person","alias":[person_string]}
-            bibserver.dao.Record.upsert(data)
+            whatid.dao.Record.upsert(data)
             return ident
 
         except:

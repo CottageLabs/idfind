@@ -55,10 +55,10 @@ class IOManager(object):
     '''get all currently available keys in ES'''
     def get_keys(self,rectype='Regex'):
         if rectype == 'Record':
-            res = bibserver.dao.Record.get_mapping()
+            res = whatid.dao.Record.get_mapping()
             which = 'record'
         elif rectype == 'Collection':
-            res = bibserver.dao.Collection.get_mapping()
+            res = whatid.dao.Collection.get_mapping()
             which = 'collection'
         keys = [str(i) for i in res[which]['properties'].keys()]
         keys.sort()
@@ -87,9 +87,9 @@ class IOManager(object):
         for item in fields:
             try:
                 if rectype == 'Record':
-                    bibserver.dao.Record.query(sort={item+self.config.facet_field: {"order":"asc"}})
+                    whatid.dao.Record.query(sort={item+self.config.facet_field: {"order":"asc"}})
                 elif rectype == 'Collection':
-                    bibserver.dao.Collection.query(sort={item: {"order":"asc"}})
+                    whatid.dao.Collection.query(sort={item: {"order":"asc"}})
                 sortfields.append(item)
             except:
                 pass
