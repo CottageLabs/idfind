@@ -190,7 +190,7 @@ class SubmitView(MethodView):
             importer = whatid.importer.Importer(owner=current_user)
             importer.submit(request)
             flash('Successfully received %s' % request.values.get("type"))
-            return redirect('/account/%s/' % current_user.id)
+            return redirect('/')
         else:
             flash('You did not provide a type - regex or identifier')
             return render_template('submit.html')
