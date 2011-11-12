@@ -133,7 +133,9 @@ class DomainObject(UserDict.IterableUserDict):
 class Regex(DomainObject):
     __type__ = 'regex'
 
-
+class Test(DomainObject):
+    __type__ = 'test'
+	
 class Identifier(DomainObject):
     __type__ = 'identifier'
 
