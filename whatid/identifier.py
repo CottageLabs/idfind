@@ -1,5 +1,7 @@
 import re
 import whatid.dao
+import urllib2
+from urllib2 import HTTPError
 
 class Identificator(object):
     def __init__(self): pass
@@ -19,10 +21,11 @@ class Identificator(object):
     def _check_regexes(self, identifier, regexes):
         success = []
         for r in regexes:
+            r = r['_source']
             match = self._check_expression(identifier, r)
-            if not match:
+            if match is None:
                 return False
-            if r['url_prefix'] is None:
+            if not r['url_prefix']:
                 success.append(r)
                 continue
             id = self._extract_id(match)
@@ -32,15 +35,15 @@ class Identificator(object):
         return success
     
     def _check_expression(self, identifier, regex):
-        result = re.match(r['regex'], identifier)
-        return result is not None
+        result = re.match(regex['regex'], identifier)
+        return result
     
-    def _match_id(self, match):
-        if match.groupdict.has_key("id"):
+    def _extract_id(self, match):
+        if match.groupdict().has_key("id"):
             return match.group("id")
         return match.group()
     
-    def _check_service(identifier, r):
+    def _check_service(self, identifier, r):
         url = r['url_prefix'] + identifier + r['url_suffix']
         try:
             urllib2.urlopen(url)
