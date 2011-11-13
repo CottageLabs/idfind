@@ -1,0 +1,27 @@
+[
+{
+    "name": "UUID4", 
+    "regex": "[\\da-fA-F]{8}-[\\da-fA-F]{4}-4[\\da-fA-F]{3}-[89ABab][\\da-fA-F]{3}-[\\da-fA-F]{12}", 
+    "url_prefix": "", 
+    "url_suffix": "",
+    "useful_links": "http://en.wikipedia.org/wiki/Universally_unique_identifier#Version_4_.28random.29", 
+    "description": "Version 4 UUIDs use a scheme relying only on random numbers. This algorithm sets the version number as well as two reserved bits. All other bits are set using a random or pseudorandom data source. Version 4 UUIDs have the form xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx where x is any hexadecimal digit and y is one of 8, 9, A, or B. e.g. f47ac10b-58cc-4372-a567-0e02b2c3d479. (Wikipedia)"
+},
+{
+    "name": "DOI", 
+    "regex": "^((http:\/\/){0,1}dx.doi.org/|(http:\/\/){0,1}hdl.handle.net\/|doi:|info:doi:){0,1}(?P<id>10\\..+\/.+)", 
+    "url_prefix": "http://dx.doi.org/", 
+    "url_suffix": "",
+    "useful_links": "http://www.doi.org/", 
+    "description": "The Digital Object Identifier (DOI®) System is for identifying content objects in the digital environment. to any entity for use on digital networks. They are used to provide current information, including where they (or information about them)  can be found on the Internet. Information about a digital object may change over time, including where to find it, but its DOI name will not change. (doi.org)"
+},
+{
+    "name": "ISSN", 
+    "regex": "[\\d]{4}-[\\d]{3}[\\dX]", 
+    "url_prefix": "", 
+    "url_suffix": "",
+    "useful_links": "http://www.issn.org/", 
+    "description": "The ISSN is the standardized international code which allows the identification of any serial publication, including electronic serials, independently of its country of publication, of its language or alphabet, of its frequency, medium, etc. (issn.org)"
+}
+
+]
