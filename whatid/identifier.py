@@ -41,7 +41,7 @@ class Identificator(object):
             return match.group("id")
         return match.group()
     
-    def _check_service(identifier, r):
+    def _check_service(self, identifier, r):
         url = r['url_prefix'] + identifier + r['url_suffix']
         try:
             urllib2.urlopen(url)
