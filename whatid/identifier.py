@@ -25,7 +25,7 @@ class Identificator(object):
             match = self._check_expression(identifier, r)
             if match is None:
                 return False
-            if r['url_prefix'] is None:
+            if not r['url_prefix']:
                 success.append(r)
                 continue
             id = self._extract_id(match)
