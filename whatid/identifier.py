@@ -18,7 +18,8 @@ class Identificator(object):
         
     def _check_regexes(self, identifier, regexes):
         success = []
-        for r in regexes['_source']:
+        for r in regexes:
+            r = r['_source']
             match = self._check_expression(identifier, r)
             if not match:
                 return False
