@@ -32,7 +32,7 @@ class Identificator(object):
         return success
     
     def _check_expression(self, identifier, regex):
-        result = re.match(r['regex'], identifier)
+        result = re.match(regex['regex'], identifier)
         return result is not None
     
     def _match_id(self, match):
