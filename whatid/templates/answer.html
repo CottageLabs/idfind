@@ -4,21 +4,31 @@
 <div class="action_box">
     <h2>The answer</h2>
 
-    <p>We think this is a:</p>
-
     {% if answer %}
-    <p>{{answer[0]['name']}}</p>
-    {% endif %}
-    
-    <p>Here is some stuff about this identifier, and some links:</p>
 
-    {% for item in answer %}
-        <p>
-        {% for thing in answer[item] %}
-            {{thing}}: {{answer[item]}}<br />
+        <h3>We think this is a:</h3>
+
+        <h1>{{answer[0]['name']}}</h1>
+        
+        <p>Here are the successful matches on this identifier, and some useful info:</p>
+
+        <table>
+        {% for item in answer %}
+            <tr>
+            {% for thing in answer[item] %}
+                <td>{{thing}}: {{answer[item][thing]}}</td>
+            {% endfor %}
+            </tr>
         {% endfor %}
-        </p>
-    {% endfor %}
+        </table>
+        
+    {% else %}
+    
+        <h2>We don't know!</h2>
+        
+        <p>Why not <a href="/">submit</a> an identifier test for it?</p>
+    
+    {% endif %}
 
 </div>
 {% endblock %}
