@@ -26,7 +26,7 @@ class Identificator(object):
             print identifier
             match = self._check_expression(identifier, r)
             if match is None:
-                return success
+                continue
             print match.group()
             if not r['url_prefix']:
                 success.append(r)
