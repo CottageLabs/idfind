@@ -12,7 +12,7 @@ class Importer(object):
     def submit(self, request):
         '''Import a regex or an identifer description into the database.'''
         record = {
-            "name": request.value["name"],
+            "name": request.values["name"],
             "regex": request.values["regex"],
             "url_prefix": request.values["url"],
             "url_suffix": request.values["suffix"],
