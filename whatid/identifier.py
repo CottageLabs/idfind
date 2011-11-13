@@ -36,7 +36,7 @@ class Identificator(object):
         result = re.match(regex['regex'], identifier)
         return result is not None
     
-    def _match_id(self, match):
+    def _extract_id(self, match):
         if match.groupdict.has_key("id"):
             return match.group("id")
         return match.group()
