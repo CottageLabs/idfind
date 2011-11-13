@@ -11,18 +11,18 @@ class Importer(object):
 
     def submit(self, request):
         '''Import a regex or an identifer description into the database.'''
-		record = {
-			"name": request.value["name"],
-			"regex": request.values["regex"],
-			"url_prefix": request.values["url"],
-			"url_suffix": request.values["suffix"],
-			"description": request.values["description"],
-			"tags": request.values["tags"].split(","),
-			"timestamp": datetime.now().isoformat(),
-			"owner": self.owner
-		}
-		if request.values["type"] == "regex":
-			whatid.dao.Test.upsert(record)
+        record = {
+            "name": request.value["name"],
+            "regex": request.values["regex"],
+            "url_prefix": request.values["url"],
+            "url_suffix": request.values["suffix"],
+            "description": request.values["description"],
+            "tags": request.values["tags"].split(","),
+            "timestamp": datetime.now().isoformat(),
+            "owner": self.owner
+        }
+        if request.values["type"] == "regex":
+            whatid.dao.Test.upsert(record)
         if request.values["type"] == "identifier":
-			whatid.dao.Description.upsert(record)
+            whatid.dao.Description.upsert(record)
         
