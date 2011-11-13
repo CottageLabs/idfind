@@ -50,6 +50,8 @@ class Identificator(object):
         pre = r['url_prefix']
         if not pre.endswith('/'):
             pre += '/'
+        if not ( pre.startswith('http://') or pre.startswith('https://') ):
+            pre = 'http://' + pre
         url =  pre + identifier + r['url_suffix']
         print url
         try:
