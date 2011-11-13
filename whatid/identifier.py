@@ -19,7 +19,7 @@ class Identificator(object):
     def _check_regexes(self, identifier, regexes):
         success = []
         for r in regexes:
-            match = self._check_expression(self,identifier, r)
+            match = self._check_expression(identifier, r)
             if not match:
                 return False
             if r['url_prefix'] is None:
