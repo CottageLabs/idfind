@@ -128,7 +128,7 @@ def identify():
         if string:
             identifier = whatid.identifier.Identificator()
             answer = identifier.identify(string)
-            return render_template('answer.html',answer=answer)
+            return render_template('answer.html',answer=answer,string=string)
         return render_template('identify.html')
 
 

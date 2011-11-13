@@ -14,10 +14,18 @@
 
         <table>
         {% for item in answer %}
-            <tr>
-            {% for thing in answer[item] %}
-                <td>{{thing}}: {{answer[item][thing]}}</td>
-            {% endfor %}
+            <tr><td>
+            <h3>{{item['name']}}</h3>
+            <p>{{item['description']}}</p>
+            </td>
+            <td>
+            {% if item['url_prefix'] %}
+                <p>Find it here: <a href="{{item['url_prefix']}}/{{item['string']}}{{item['url_suffix']}}">{{item['url_prefix']}}/{{string}}{{item['url_suffix']}}</a></p>
+            {% endif %}
+            {% if item['useful_links'] %}
+                <p>Learn more: <a href="{{item['useful_links']}}">{{item['useful_links']}}</a></p>
+            {% endif %}
+            </td>
             </tr>
         {% endfor %}
         </table>
