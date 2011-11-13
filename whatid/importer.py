@@ -17,6 +17,8 @@ class Importer(object):
             "url_prefix": request.values["url"],
             "url_suffix": request.values["suffix"],
             "description": request.values["description"],
+			# TODO: refactor useful links handling below (and perhaps submit.html template) to allow for multiple useful links
+			"useful_links": request.values["useful_link1"],
             "tags": request.values["tags"].split(","),
             "timestamp": datetime.now().isoformat(),
             "owner": self.owner

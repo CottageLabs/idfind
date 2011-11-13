@@ -31,7 +31,7 @@ class Identificator(object):
                 success.append(r)
         return success
     
-    def _check_expression(identifier, regex):
+    def _check_expression(self, identifier, regex):
         result = re.match(r['regex'], identifier)
         return result is not None
     
