@@ -37,7 +37,7 @@ class Identificator(object):
         return result
     
     def _extract_id(self, match):
-        if "id" in match.groupdict:
+        if match.groupdict().has_key("id"):
             return match.group("id")
         return match.group()
     
