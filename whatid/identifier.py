@@ -21,7 +21,7 @@ class Identificator(object):
         for r in regexes:
             r = r['_source']
             match = self._check_expression(identifier, r)
-            if not match:
+            if match is None:
                 return False
             if r['url_prefix'] is None:
                 success.append(r)
@@ -34,7 +34,7 @@ class Identificator(object):
     
     def _check_expression(self, identifier, regex):
         result = re.match(regex['regex'], identifier)
-        return result is not None
+        return result
     
     def _extract_id(self, match):
         if match.groupdict.has_key("id"):
