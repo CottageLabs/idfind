@@ -130,11 +130,10 @@ class DomainObject(UserDict.IterableUserDict):
         # pass through the result raw
         return result.read()
 
-
-class Regex(DomainObject):
-    __type__ = 'regex'
-
 class Test(DomainObject):
+    __type__ = 'test'
+	
+class Description(DomainObject):
     __type__ = 'test'
 	
 class Identifier(DomainObject):
