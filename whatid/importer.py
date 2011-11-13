@@ -21,7 +21,7 @@ class Importer(object):
 			"useful_links": request.values["useful_link1"],
             "tags": request.values["tags"].split(","),
             "timestamp": datetime.now().isoformat(),
-            "owner": self.owner
+            "owner": self.owner.id
         }
         if request.values["type"] == "regex":
             whatid.dao.Test.upsert(record)
