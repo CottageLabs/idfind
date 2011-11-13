@@ -2,11 +2,9 @@
 
 {% block content %}
 <div class="action_box">
-    <h2>The answer</h2>
+    <h1>{{string}}</h1>
 
     {% if answer %}
-
-        <h3>We think this is a:</h3>
 
         <h1>{{answer[0]['name']}}</h1>
         
@@ -18,12 +16,17 @@
             <h3>{{item['name']}}</h3>
             <p>{{item['description']}}</p>
             </td>
-            <td>
+            <td class="span6">
             {% if item['url_prefix'] %}
-                <p>Find it here: <a href="{{item['url_prefix']}}{{item['string']}}{{item['url_suffix']}}">{{item['url_prefix']}}{{string}}{{item['url_suffix']}}</a></p>
+                <p>Find it here: <a href="{{item['url_prefix']}}{{string}}{{item['url_suffix']}}">{{item['url_prefix']}}{{string}}{{item['url_suffix']}}</a></p>
             {% endif %}
             {% if item['useful_links'] %}
-                <p>Learn more: <a href="{{item['useful_links']}}">{{item['useful_links']}}</a></p>
+                <p>Learn more</p>
+                <ul>
+                {% for link in item['useful_links'] %}
+                    <li><a href="{{link}}">{{link}}</a></li>
+                {% endfor %}
+                </ul>
             {% endif %}
             </td>
             </tr>

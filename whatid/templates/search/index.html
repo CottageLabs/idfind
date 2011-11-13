@@ -6,9 +6,6 @@
   <div class="search_box">
       <form method="get" action="">
           <input type="text" id="searchbox" name="q" value='{{io.get_q()}}' />
-          {% for item in io.get_safe_terms_object() %}
-          <input type="hidden" name="{{item}}" value='{{io.get_safe_terms_object()[item]}}' />
-          {% endfor %}
           {% if io.page_size() != 10 %}
               <input type="hidden" name="size" value="{{io.page_size()}}" />
           {% endif %}
@@ -16,7 +13,6 @@
               <input type="hidden" name="sort" value="{{io.sorted_by()}}{{io.config.facet_field}}" />
               <input type="hidden" name="order" value="{{io.sort_order()}}" />
           {% endif %}
-            <input type="hidden" name="showkeys" value="{{io.get_showkeys()}}" />
           <input type="submit" name="search" value="Search" />
       </form>
       <form method="get" action="">
@@ -33,11 +29,6 @@
         <h3>{{io.implicit_key}} : <a href="/{{io.implicit_key}}/{{io.implicit_value}}">{{io.implicit_value}}</a></h3>
     {% endif %}
 {% endif %}
-
-    <div id="navigation">
-        {% include "search/facet.html" %}
-        {% include "search/display.html" %}
-    </div>
     
     <div id="panel">
     
@@ -58,7 +49,6 @@
     </div>
 
     <div class="resultstrap">
-    {{io.get_meta()|safe}}
     </div>
 {% endblock %}
 

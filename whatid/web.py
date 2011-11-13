@@ -60,8 +60,8 @@ def content(path):
     return render_template('home/content.html', page=path)
 
 
-@app.route('/regex')
-@app.route('/regex/<rid>')
+#@app.route('/test')
+#@app.route('/test/<rid>')
 def regex(rid=None):
     JSON = False
     if rid.endswith(".json") or request.values.get('format',"") == "json":
@@ -81,11 +81,11 @@ def regex(rid=None):
         return outputJSON(results=res, coll=cid, record=True)
     else:
         io = whatid.iomanager.IOManager(res)
-        return render_template('regex.html', io=io)
+        return render_template('test.html', io=io)
 
 
-@app.route('/identifier')
-@app.route('/identifier/<iid>')
+#@app.route('/identifier')
+#@app.route('/identifier/<iid>')
 def identifier(iid=None):
     JSON = False
     if iid.endswith(".json") or request.values.get('format',"") == "json":
@@ -108,42 +108,67 @@ def identifier(iid=None):
         return render_template('identifier.html', io=io)
 
 
-@app.route('/identify', methods=['GET','POST'])
-def identify():
-    # string=10.1007/12345678..
-    #[
-    #  {
-    #    "string":"10.1007/12345678..",
-    #    "type":"doi",
-    #    "confidence":"1.0",
-    #    "actions":[...]
-    #  },
-    #  ...
-    #]
-    if request.method == "GET":
-        return render_template('identify.html')
+#@app.route('/description')
+#@app.route('/description/<iid>')
+def description(did=None):
+    JSON = False
+    if did.endswith(".json") or request.values.get('format',"") == "json":
+        did = did.replace(".json","")
+        JSON = True
 
-    if request.method == "POST":
-        string = request.values.get('string','')
-        if string:
-            identifier = whatid.identifier.Identificator()
-            answer = identifier.identify(string)
-            return render_template('answer.html',answer=answer,string=string)
-        return render_template('identify.html')
+    if did:
+        # get the identifier to which the rid points
+        pass
+    else:
+        # get the search page of the regex collection
+        pass
+        
+    if res["hits"]["total"] == 0:
+        abort(404)
+    elif JSON:
+        return outputJSON(results=res, coll=cid, record=True)
+    else:
+        io = whatid.iomanager.IOManager(res)
+        return render_template('description.html', io=io)
+
+
+@app.route('/identify', methods=['GET','POST'])
+@app.route('/identify<therest>', methods=['GET','POST'])
+def identify(therest=''):
+    JSON = False
+    if therest.endswith(".json") or request.values.get('format',"") == "json":
+        JSON = True
+        
+    q = request.values.get('q','').strip('"')
+    if q:
+        # check the storage of identifiers, if already there, respond. else find it.
+        identifier = whatid.dao.Identifier.query(q=q)
+        if identifier['hits']['total'] != 0:
+            flash('We already have that one!')
+            return redirect('/identifier/'+q)
+
+        ident = whatid.identifier.Identificator()
+        answer = ident.identify(q)
+        if answer:
+            # save the identifier with its type, and add to the success rate of the test
+            result = answer[0]
+            #obj = whatid.dao.Test.get(answer[0]['id'])
+            #obj['matches'] = obj.get('matches',0) + 1
+            #obj.save()
+            result['identifier'] = q
+            whatid.dao.Identifier.upsert(result)
+        else:
+            whatid.dao.Identifier.upsert({"type":"unknown","identifier":q})
+        if JSON:
+            return outputJSON(results=answer)
+        else:
+            return render_template('answer.html',answer=answer,string=q)
+
+    return render_template('identify.html')
 
 
 @app.route('/parse', methods=['GET','POST'])
 def parse():
-    # string="stuff that may have identifier in it"
-    #[
-    #  {
-    #    "string":"blah",
-    #    "type":"doi",
-    #    "confidence":"1.0",
-    #    "actions":[...]
-    #  },
-    #  ...
-    #]
     pass
 
 
@@ -185,16 +210,47 @@ class SubmitView(MethodView):
     def post(self):
         if not auth.collection.create(current_user, None):
             abort(401)
+        # TODO: need some better validation. see python flask docs for info.
         if 'type' in request.values:
             importer = whatid.importer.Importer(owner=current_user)
             importer.submit(request)
             flash('Successfully received %s' % request.values.get("type"))
             return redirect('/')
         else:
-            flash('You did not provide a type - regex or identifier')
+            flash('You did not tell us if you are submitting a test or a description')
             return render_template('submit.html')
 
 app.add_url_rule('/submit', view_func=SubmitView.as_view('submit'))
+
+
+@app.route('/record/<path:path>')
+def record(path):
+    JSON = False
+    if path.endswith(".json") or request.values.get('format',"") == "json":
+        path = path.replace(".json","")
+        JSON = True
+
+    res = whatid.dao.Test.query(q='id:"' + path + '"')
+
+    if res["hits"]["total"] == 0:
+        abort(404)
+    elif JSON:
+        return outputJSON(results=res, coll=cid, record=True)
+    elif res["hits"]["total"] != 1:
+        io = whatid.iomanager.IOManager(res)
+        return render_template('record.html', io=io, multiple=True)
+    else:
+        io = whatid.iomanager.IOManager(res)
+        return render_template('record.html', io=io)
+
+
+@app.route('/<path:path>')
+def search(path=''):
+    io = dosearch(path.replace(".json",""))
+    if path.endswith(".json") or request.values.get('format',""):
+        return outputJSON(results=io.results)
+    else:
+        return render_template('search/index.html', io=io)
 
 
 # twitter
@@ -203,7 +259,7 @@ app.add_url_rule('/submit', view_func=SubmitView.as_view('submit'))
 # can build response out of the other sections
 
 
-def dosearch(path,searchtype='Regex'):
+def dosearch(path,searchtype='identifier'):
     args = {}
     if 'from' in request.values:
         args['start'] = request.values.get('from')
@@ -216,11 +272,25 @@ def dosearch(path,searchtype='Regex'):
         if len(request.values.get('q')) > 0:
             args['q'] = request.values.get('q')
 
-    if searchtype == 'Record':
-        results = whatid.dao.Record.query(**args)
-    else:
-        results = whatid.dao.Collection.query(**args)
-    return whatid.iomanager.IOManager(results, args, facet_fields, showkeys, incollection, implicit_key, implicit_value, path)
+    if path != '' and not path.startswith("search"):
+        path = path.strip()
+        if path.endswith("/"):
+            path = path[:-1]
+        bits = path.split('/',1)
+        if len(bits) == 2:
+            implicit_key = bits[0]
+            implicit_value = bits[1]
+
+    if implicit_key:
+        args['q'] = implicit_value
+
+    if searchtype == 'identifier' or implicit_key == 'identifier':
+        results = whatid.dao.Identifier.query(**args)
+    if searchtype == 'test' or implicit_key == 'test':
+        results = whatid.dao.Test.query(**args)
+    if searchtype == 'description' or implicit_key == 'description':
+        results = whatid.dao.Description.query(**args)
+    return whatid.iomanager.IOManager(results, args)
 
 
 def outputJSON(results, record=False):
@@ -228,9 +298,7 @@ def outputJSON(results, record=False):
     # TODO: in some circumstances, people data should be added to collections too.
     out = {"metadata":{}}
     out['metadata']['query'] = request.base_url + '?' + request.query_string
-    out['records'] = [i['_source'] for i in results['hits']['hits']]
-    if request.values.get('facets','') and results['facets']:
-        out['facets'] = results['facets']
+    out['records'] = results
     out['metadata']['from'] = request.values.get('from',0)
     out['metadata']['size'] = request.values.get('size',10)
 

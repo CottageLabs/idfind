@@ -17,7 +17,7 @@ def init_db():
 
 def get_conn():
     host = "127.0.0.1:9200"
-    db_name = "whatid"
+    db_name = "idhelp"
     conn = pyes.ES([host])
     return conn, db_name
 
@@ -55,11 +55,6 @@ class DomainObject(UserDict.IterableUserDict):
                 return None
             else:
                 raise
-
-    @classmethod
-    def get_mapping(cls):
-        conn, db = get_conn()
-        return conn.get_mapping(cls.__type__, db)
 
     @classmethod
     def upsert(cls, data, state=None):
@@ -138,7 +133,6 @@ class Description(DomainObject):
 	
 class Identifier(DomainObject):
     __type__ = 'identifier'
-
 
 class Account(DomainObject, UserMixin):
     __type__ = 'account'

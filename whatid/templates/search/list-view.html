@@ -1,18 +1,15 @@
 <div class="list_view">
     {% for i in range(io.set()|length) %}
         <div class="list_result list_result_{{'odd' if i % 2 == 0 else 'even'}}">
-            <div class="list_result_output">{{io.get_result_display(i)|safe}}</div>
+            <div class="list_result_output">
+                {{io.get_record_as_table()|safe}}
+            </div>
 
             <div class="list_result_options">
             {% if io.get_str(io.set()[i], "citekey") != "" %}
             <a href="/record/{{io.get_str(io.set()[i], "collection", True)|safe}}/{{io.get_str(io.set()[i], "citekey")|safe}}">View record</a><br />
             {% else %}
             <a href="/record/{{io.get_str(io.set()[i], "id")|safe}}">View record</a><br />
-            {% endif %}
-            {% if not io.incollection %}
-                {% if io.get_str(io.set()[i], "collection") %}
-                in: {{io.get_str(io.set()[i], "collection")|safe}}
-                {% endif %}
             {% endif %}
             </div>
             <div class="resultstrap"></div>

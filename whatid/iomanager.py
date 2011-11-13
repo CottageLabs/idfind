@@ -1,12 +1,15 @@
 import urllib2
 from copy import deepcopy
 import whatid.dao
+import whatid.config
 
 class IOManager(object):
     def __init__(self, results, args={}, path=""):
         self.results = results
         self.args = args
         self.path = path
+        self.config = whatid.config.Config()
+
 
     def get_q(self):
         return self.args.get('q','')
@@ -18,39 +21,6 @@ class IOManager(object):
         if self.showkeys:
             param += 'showkeys=' + self.showkeys + '&'
         return param
-
-    def get_result_display(self,counter):
-        '''use the result_display object as a template for search results'''
-        display = self.config.result_display
-        output = ""
-        if not display:
-            return output
-
-        for item in display:
-            line = ""
-            for pobj in item:
-                if 'key' in pobj:
-                    keydisp = self.get_str(self.set()[counter],pobj['key'])
-                    if keydisp:
-                        try:
-                            keydisp = unichr(keydisp)
-                        except:
-                            pass
-                        line += pobj.get('pre','') + keydisp + pobj.get('post','') + " "
-                if 'default' in pobj:
-                    line += pobj.get('default','') + " "
-            if line:
-                output += line.strip().strip(",") + "<br />"
-
-        if self.get_showkeys():
-            output += '<table>'
-            keys = [i for i in self.get_showkeys().split(',')]
-            for key in keys:
-                out = self.get_str(self.set()[counter],key)
-                if out:
-                    output += '<tr><td><strong>' + key + '</strong>: ' + out + '</td></tr>'
-            output += '</table>'
-        return output
         
     '''get all currently available keys in ES'''
     def get_keys(self,rectype='Regex'):

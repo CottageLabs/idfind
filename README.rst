@@ -1,12 +1,12 @@
 WhatID - Got an ID? Not sure what it is? What you can do with it? Well, use this!
 
-More info: http://whatid.cottagelabs.com
+More info: http://idhelp.cottagelabs.com
 
 
 How It Works
 ============
 
-Further information at http://whatid.cottagelabs.com
+Up and running at http://idhelp.cottagelabs.com
 
 
 Install

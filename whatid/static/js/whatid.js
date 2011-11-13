@@ -36,7 +36,6 @@ jQuery(document).ready(function() {
     }
     jQuery('#collection').bind('keyup',checkcoll);
 
-
     
 });
 

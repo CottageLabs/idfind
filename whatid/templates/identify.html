@@ -2,27 +2,23 @@
 
 {% block content %}
 <div class="action_box">
-    <form action="/identify" method="POST" enctype="multipart/form-data">
-    <fieldset>
 
+
+      <div class="hero-unit">
         <h2>Identify</h2>
 
         <p>Submit an identifier and we will try to tell you what it is.</p>
 
-        <div class="clearfix">
-        <label for="regex">String</label>
-        <div class="input">
-        <input class="span6" type="text" name="string" />
-        </div>
-        </div>
+        <form action="/identify" method="POST" enctype="multipart/form-data">
+        <input class="frontin" type="text" name="q" value="/^(IDHelp).*?$/" />
 
-        <div class="clearfix">
-        <label for="submit">&nbsp;</label>
-        <div class="input"><input class="btn primary span6" type="submit" name="submit" value="submit" /></div>
-        </div>
+        <input class="btn primary span2" type="submit" name="submit" value="submit" />
 
-    </fieldset>
-    </form>
+        </form>
+
+        <p><small>example: 10.1186/1758-2946-3-47</small></p>
+      </div>
+
 </div>
 {% endblock %}
 

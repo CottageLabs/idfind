@@ -1,67 +1,109 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+<script type="text/javascript">
+jQuery(document).ready(function() {    
+    var updateform = function(event) {
+        event.preventDefault();
+        if (jQuery(this).val() == "description") {
+            jQuery('.fortest').hide();
+        } else {
+            jQuery('.fortest').show();
+        }
+    }
+    jQuery('input[name=type]').bind('change',updateform);
+});
+</script>
+
 <div class="action_box">
     <form action="/submit" method="POST" enctype="multipart/form-data">
     <fieldset>
 
         <h2>Submit</h2>
 
-        <p>This service works on a collection of identifier descriptions and a collection of methods for identifying identifiers.</p>
-        <p>These collections are built up from community submissions.</p>
+        <p>This service works on a collection of tests for identifying identifiers, 
+        built up from community submissions. We also collect descriptions of 
+        different sorts of identifier, so that other people can learn about them.</p>
 
         <div class="clearfix">
-        <label for="type">Submit</label>
+        <label for="test_or_desc">Do you want to submit a test or description?</label>
         <div class="input">
         <ul class="inputs-list">
             <li>
                 <label>
-                <input type="radio" name="type" value="regex" />
+                <input type="radio" name="test_or_desc" value="test" />
                 <span>A test for a kind of identifier</span>
                 </label>
             </li>
             <li>
                 <label>
-                <input type="radio" name="type" value="identifier" />
+                <input type="radio" name="test_or_desc" value="description" />
                 <span>A description of a type of identifier</span>
                 </label>
             </li>
         </ul>
-        <span class="help-block">
-        Learn more about <a href="/content/regex">tests</a> and <a href="/content/identifier">descriptions</a>
-        </span>
         </div>
         </div>
 
         <div class="clearfix">
-        <label for="name">Name</label>
+        <label for="name">Short name for the identifier</label>
         <div class="input">
-        <input class="span6" type="text" name="name" />
+        <input class="span2" type="text" name="name" />
         <span class="help-block">
-        A short name for the identifier. (Ex.: DOI would mean Digital object identifier)
+        This should be an obvious short name for the identifier e.g. DOI for 
+        digital object identifier. We will try to match what you type to any 
+        shortnames already in use, or you can search short names already in use
         </span>
         </div>
         </div>
 
-        <div class="clearfix">
+        <div class="clearfix fortest">
         <label for="regex">Regular expression</label>
         <div class="input">
         <input class="span6" type="text" name="regex" />
         <span class="help-block">
-        A pythonic <a href="/content/regex">regular expression</a> that will match the identifier
+        A <a target="_blank" href="http://www.regular-expressions.info/">
+        regular expression</a> that will match the identifier. 
         </span>
         </div>
         </div>
 
-        <div class="clearfix">
+        <div class="clearfix fortest">
         <label for="url">Lookup Service URL</label>
         <div class="input">
-            <input class="span4" type="text" name="url" />
-            <input class="span2" type="text" name="suffix" />
+            <input class="span4" type="text" name="url_prefix" />
+            <input class="span2" type="text" name="url_suffix" />
         <span class="help-block">
-        The <a href="/content/url">main URL</a> of the service to which this type of identifier could be submitted. 
-        <br />(And any <a href="/content/urlsuffix">URL suffix</a> that may be required, 
-        for example if the identifier has to slot into the middle of a URL.)
+        if this identifier can be submitted to a URL, e.g like a
+        DOI can be submitted to http://dx.doi.org/, then provide the URL here.
+        <br />If you know of a service that will validate a particular 
+        identifier, put the URL here<br />
+        <br />(If any <a href="/content/urlsuffix">URL suffix</a> is required, 
+        add it in the second small box)
+        </span>
+        </div>
+        </div>
+
+        <div class="clearfix fortest">
+        <label for="url">Success response</label>
+        <div class="input">
+            <select class="span2" name="header_or_body">
+                <option>header</option>
+                <option>body</option>
+            </select>
+            <select class="span2" name="is_is_not">
+                <option>has</option>
+                <option>has not</option>
+            </select>
+            <input class="span2" type="text" name="response_test" />
+            <a id="more_responses" class="btn" href="">add more</a>
+        <span class="help-block">
+        We assume that if a service URL does not return a 404, 
+        then the identifier is valid. If, however, you have provided a service URL 
+        that operates differently, please tell us either the headers that signify 
+        success, or a string that we should search the response body for in the 
+        event of successful identification.
         </span>
         </div>
         </div>
@@ -71,7 +113,7 @@
         <div class="input">
         <textarea class="span6" name="description"></textarea>
         <span class="help-block">
-        A simple description about the identifier.
+        A description about the identifier - what it relates to, what it does.
         </span>
         </div>
         </div>
@@ -79,9 +121,13 @@
 		<div class="clearfix">
         <label for="useful_link1">Useful links</label>
         <div class="input">
-            <input class="span6" type="text" name="useful_link1" />
+            <input class="span6" type="text" name="useful_link1" /> 
+            <a id="more_links" class="btn" href="">add more</a>
         <span class="help-block">
-        Additional useful links related to the identifier you're describing.
+        Any additional useful links related to the identifier you're describing, 
+        e.g. a page explaining the purpose of the identifier, maybe wikipedia or 
+        on the provider site, or perhaps alternative URLs to which the identifier 
+        can be sent that return useful information.
         </span>
         </div>
         </div>
@@ -89,16 +135,19 @@
         <div class="clearfix">
         <label for="tags">Tags</label>
         <div class="input">
-        <input class="span6" type="text" name="tags" />
+            <input class="span2" type="text" name="tags" /> 
+            <a id="more_tags" class="btn" href="">add more</a>
         <span class="help-block">
-        Any <a href="/content/tags">tag words</a> that describe this identifier or its' function. Separate by commas.
+        Any <a href="/content/tags">tag words</a> that describe this identifier 
+        or its' function.
         </span>
         </div>
         </div>
 
         <div class="clearfix">
         <label for="submit">&nbsp;</label>
-        <div class="input"><input class="btn primary span6" type="submit" name="submit" value="submit" /></div>
+        <div class="input"><input class="btn primary span6" type="submit" 
+            name="submit" value="submit" /></div>
         </div>
 
     </fieldset>

@@ -4,13 +4,20 @@
 
       <div class="hero-unit">
         <form action="/identify" method="POST" enctype="multipart/form-data">
-        <input class="frontin" type="text" name="string" value="/^(IDHelp).*?$/" />
+        <input class="frontin" type="text" name="q" value="/^(IDHelp).*?$/" />
         </form>
         <p>Got an ID? Not sure what it is? What you can do with it? Just paste above and hit enter!</p>
         <p><small>example: 10.1186/1758-2946-3-47</small></p>
       </div>
 
       <div class="row">
+        <div class="span4 column">
+          <div class="alert-message block-message info">
+          <h2>Browse</h2>
+          <p>Have a look at the tests, descriptions and identifiers in our catalogue.</p>
+          <p><a href="/browse" class="btn">Browse &raquo;</a></p>
+          </div>
+        </div>
         <div class="span4 column info">
           <div class="alert-message block-message info">
           <h2>Identify</h3>
@@ -20,15 +27,8 @@
         </div>
         <div class="span4 column">
           <div class="alert-message block-message info">
-          <h2>Parse</h2>
-          <p>You got some text, and there may be an identifier in it. But where?</p>
-          <p><a href="/parse" class="btn">Parse &raquo;</a></p>
-          </div>
-        </div>
-        <div class="span4 column">
-          <div class="alert-message block-message info">
           <h2>Submit</h2>
-          <p>You have a method for identifying identifiers - tell us about it</p>
+          <p>Help us identify identifiers - submit a test or a description</p>
           <p><a href="/submit" class="btn">Submit &raquo;</a></p>
           </div>
         </div>
