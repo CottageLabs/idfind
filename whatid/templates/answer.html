@@ -6,7 +6,17 @@
 
     <p>We think this is a:</p>
 
-    <p>Super duper thing.</p>
+    <p>{{answer[0]['name']}}</p>
+    
+    <p>Here is some stuff about this identifier, and some links:</p>
+
+    {% for item in answer %}
+        <p>
+        {% for thing in answer[item] %}
+            {{thing}}: {{answer[item]}}<br />
+        {% endfor %}
+        </p>
+    {% endfor %}
 
 </div>
 {% endblock %}

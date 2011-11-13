@@ -3,7 +3,7 @@ from flask import render_template, flash
 from flask.views import View, MethodView
 from flaskext.login import login_user, current_user
 
-#import whatid.identifier
+import whatid.identifier
 import whatid.dao
 import whatid.iomanager
 import whatid.importer
@@ -126,9 +126,8 @@ def identify():
     if request.method == "POST":
         string = request.values.get('string','')
         if string:
-            #identifier = whatid.identifier.Identificator()
-            #answer = identifier.identify(string)
-            answer=''
+            identifier = whatid.identifier.Identificator()
+            answer = identifier.identify(string)
             return render_template('answer.html',answer=answer)
         return render_template('identify.html')
 
