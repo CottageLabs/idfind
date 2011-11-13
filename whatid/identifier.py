@@ -1,5 +1,7 @@
 import re
 import whatid.dao
+import urllib2
+from urllib2 import HTTPError
 
 class Identificator(object):
     def __init__(self): pass
