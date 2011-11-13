@@ -11,10 +11,15 @@ class Importer(object):
 
     def submit(self, request):
         '''Import a regex or an identifer description into the database.'''
+        pre = request.values.get("url",'')
+        if not pre.endswith('/'):
+            pre += '/'
+        if not ( pre.startswith('http://') or pre.startswith('https://') ):
+            pre = 'http://' + pre
         record = {
             "name": request.values["name"],
             "regex": request.values["regex"],
-            "url_prefix": request.values["url"],
+            "url_prefix": pre,
             "url_suffix": request.values["suffix"],
             "description": request.values["description"],
 			# TODO: refactor useful links handling below (and perhaps submit.html template) to allow for multiple useful links

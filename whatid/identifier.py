@@ -47,12 +47,7 @@ class Identificator(object):
         return match.group()
     
     def _check_service(self, identifier, r):
-        pre = r['url_prefix']
-        if not pre.endswith('/'):
-            pre += '/'
-        if not ( pre.startswith('http://') or pre.startswith('https://') ):
-            pre = 'http://' + pre
-        url =  pre + identifier + r['url_suffix']
+        url =  r['url_prefix'] + identifier + r['url_suffix']
         print url
         try:
             urllib2.urlopen(url)
