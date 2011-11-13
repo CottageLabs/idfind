@@ -134,7 +134,7 @@ class Test(DomainObject):
     __type__ = 'test'
 	
 class Description(DomainObject):
-    __type__ = 'test'
+    __type__ = 'description'
 	
 class Identifier(DomainObject):
     __type__ = 'identifier'
