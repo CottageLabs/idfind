@@ -9,7 +9,7 @@ class Identificator(object):
         # get all of the regular expressions
         d = {'from' : 0, 'size' : 100};
         while True:
-            regexes = whatid.dao.Regex.query(**d)
+            regexes = whatid.dao.Test.query(**d)
             if len(regexes['hits']['hits']) == 0:
                 break
             d = {'from' : d['from'] + d['size'], 'size' : 100}
