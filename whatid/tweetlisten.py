@@ -9,3 +9,5 @@ class TweetListen(object):
         
 
 https://api.twitter.com/1/statuses/mentions.json?include_entities=true
+
+#https://dev.twitter.com/docs/auth/oauth
