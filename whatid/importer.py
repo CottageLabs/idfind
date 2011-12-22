@@ -11,19 +11,25 @@ class Importer(object):
 
     def submit(self, request):
         '''Import an identifer test or description into the index.'''
+        
         pre = request.values.get("url_prefix",'')
-        
-        useful_links = [request.values.get("useful_link1",'')]
-        
         if not pre.endswith('/'):
             pre += '/'
         if not ( pre.startswith('http://') or pre.startswith('https://') ):
             pre = 'http://' + pre
+        
+        # TODO: move resptest* out of "record" below and put here, we need to do some processing - resptest_type and resptest_cond should only be saved if resptest is not None
+        
+        useful_links = [request.values.get("useful_link1",'')]
+            
         record = {
             "name": request.values.get("name",''),
             "regex": request.values.get("regex",''),
             "url_prefix": pre,
             "url_suffix": request.values.get("url_suffix",''),
+            "resptest": request.values.get("resptest",''),
+            "resptest_type": request.values.get("resptest_type",''),
+            "resptest_cond": request.values.get("resptest_cond",''),
             "description": request.values.get("description",''),
             # TODO: refactor useful links handling below (and perhaps submit.html template) to allow for multiple useful links
             "useful_links": useful_links,
