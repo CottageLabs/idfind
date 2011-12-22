@@ -11,8 +11,10 @@ class Importer(object):
 
     def submit(self, request):
         '''Import an identifer test or description into the index.'''
-        pre = request.values.get("url_suffix",'')
+        pre = request.values.get("url_prefix",'')
+        
         useful_links = [request.values.get("useful_link1",'')]
+        
         if not pre.endswith('/'):
             pre += '/'
         if not ( pre.startswith('http://') or pre.startswith('https://') ):
