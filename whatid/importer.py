@@ -23,15 +23,16 @@ class Importer(object):
             "url_prefix": pre,
             "url_suffix": request.values.get("url_suffix",''),
             "description": request.values.get("description",''),
-			# TODO: refactor useful links handling below (and perhaps submit.html template) to allow for multiple useful links
-			"useful_links": useful_links,
+            # TODO: refactor useful links handling below (and perhaps submit.html template) to allow for multiple useful links
+            "useful_links": useful_links,
             "tags": request.values.get("tags",'').split(","),
             "created": datetime.now().isoformat(),
             "modified": datetime.now().isoformat(),
             "owner": self.owner.id
         }
-        if request.values["type"] == "regex":
+        
+        if request.values["test_or_desc"] == "test":
             whatid.dao.Test.upsert(record)
-        if request.values["type"] == "description":
+        if request.values["test_or_desc"] == "description":
             whatid.dao.Description.upsert(record)
         

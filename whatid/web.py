@@ -203,7 +203,7 @@ class SubmitView(MethodView):
         if not auth.collection.create(current_user, None):
             flash('You need to login to be able to submit.')
             return redirect('/account/login')
-        if request.values.get("type") is not None:
+        if request.values.get("test_or_desc") is not None:
             return self.post()
         return render_template('submit.html')
 
@@ -211,10 +211,10 @@ class SubmitView(MethodView):
         if not auth.collection.create(current_user, None):
             abort(401)
         # TODO: need some better validation. see python flask docs for info.
-        if 'type' in request.values:
+        if 'test_or_desc' in request.values:
             importer = whatid.importer.Importer(owner=current_user)
             importer.submit(request)
-            flash('Successfully received %s' % request.values.get("type"))
+            flash('Successfully received %s' % request.values.get("test_or_desc"))
             return redirect('/')
         else:
             flash('You did not tell us if you are submitting a test or a description')
