@@ -18,7 +18,13 @@ class Importer(object):
         if not ( pre.startswith('http://') or pre.startswith('https://') ):
             pre = 'http://' + pre
         
-        # TODO: move resptest* out of "record" below and put here, we need to do some processing - resptest_type and resptest_cond should only be saved if resptest is not None
+        resptest = request.values.get("resptest",'')
+        if resptest != '':
+            resptest_type = request.values.get("resptest_type",'')
+            resptest_cond = request.values.get("resptest_cond",'')
+        else:
+            resptest_type = ''
+            resptest_cond = ''
         
         useful_links = [request.values.get("useful_link1",'')]
             
@@ -27,9 +33,9 @@ class Importer(object):
             "regex": request.values.get("regex",''),
             "url_prefix": pre,
             "url_suffix": request.values.get("url_suffix",''),
-            "resptest": request.values.get("resptest",''),
-            "resptest_type": request.values.get("resptest_type",''),
-            "resptest_cond": request.values.get("resptest_cond",''),
+            "resptest": resptest,
+            "resptest_type": resptest_type,
+            "resptest_cond": resptest_cond,
             "description": request.values.get("description",''),
             # TODO: refactor useful links handling below (and perhaps submit.html template) to allow for multiple useful links
             "useful_links": useful_links,
