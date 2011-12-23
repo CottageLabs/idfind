@@ -150,4 +150,3 @@ class Account(DomainObject, UserMixin):
             })
         colls = [ Collection(**item['_source']) for item in colls['hits']['hits'] ]
         return colls
-
