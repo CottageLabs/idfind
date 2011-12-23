@@ -117,7 +117,7 @@ class DomainObject(UserDict.IterableUserDict):
             return msg
 
         host = "127.0.0.1:9200"
-        db_path = "whatid"
+        db_path = "idhelp"
         fullpath = '/' + db_path + '/' + self.__type__ + '/_search' + '?' + query_string
         c =  httplib.HTTPConnection(host)
         c.request('GET', fullpath)
