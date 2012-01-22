@@ -1,28 +1,64 @@
+#https://api.twitter.com/1/statuses/mentions.json?include_entities=true
+#https://dev.twitter.com/docs/auth/oauth
+
 '''this tracks tweets on twitter and when one comes in with a string to identify,
 it tries to identify it and passes back the result as a tweet'''
 
-import urllib2
 import twitter
-import json
+import re
 import whatid.dao
+import whatid.identifier
 
 class TweetListen(object):
     def __init__(self):
-        # EET: need to learn how to query ES once and for all from code - just index/type and also  index/type/name:value pairs. Get the twitter credentials from the ES index and use them to connect, then continue development: we need to parse mentions (and perhaps DMs?) as per issue #1 on GitHub
         credentials = whatid.dao.TwitterCredentials.query(q='*')
-        # OK, that works - we can now create the twitter.Api below
-        # print credentials['hits']['hits'][0]['_source']['consumer_key']
         
         api = twitter.Api(
-            consumer_key = credentials['hits']['hits'][0]['_source']['consumer_key'],
-            consumer_secret = credentials['hits']['hits'][0]['_source']['consumer_secret'],
-            access_token_key = credentials['hits']['hits'][0]['_source']['access_token_key'],
-            access_token_secret = credentials['hits']['hits'][0]['_source']['access_token_secret'])
-            
-        print api.VerifyCredentials()
+        consumer_key = credentials['hits']['hits'][0]['_source']['consumer_key'],
+        consumer_secret = credentials['hits']['hits'][0]['_source']['consumer_secret'],
+        access_token_key = credentials['hits']['hits'][0]['_source']['access_token_key'],
+        access_token_secret = credentials['hits']['hits'][0]['_source']['access_token_secret']
+        )
+                
+        regex = re.compile("@emanuil_tolev (.+)", re.IGNORECASE)
+        i = 0
+        
+        mentions = api.GetMentions()
+        status = mentions[0]
+        
+        i += 1
+        match = regex.search(status.text)
+        if match:
+            q = match.group(1)
+            # check the storage of identifiers, if already there, respond. else find it.
+            # identifier = whatid.dao.Identifier.query(q=q)
+            # if identifier['hits']['total'] != 0:
+                # print str(i)+' Got it! From the storage.'
+                # # continue
+                # exit()
 
-#https://api.twitter.com/1/statuses/mentions.json?include_entities=true
-
-#https://dev.twitter.com/docs/auth/oauth
+            ident = whatid.identifier.Identificator()
+            answer = ident.identify(q)
+            if answer:
+                # save the identifier with its type, and add to the success rate of the test
+                result = answer[0]
+                #obj = whatid.dao.Test.get(answer[0]['id'])
+                #obj['matches'] = obj.get('matches',0) + 1
+                #obj.save()
+                result['identifier'] = q
+                whatid.dao.Identifier.upsert(result)
+                
+                #api.PostUpdate(result, in_reply_to_status_id = status.id)
+                print 'Got it! Engine ident.'
+                # continue
+                exit()
+            else:
+                whatid.dao.Identifier.upsert({"type":"unknown","identifier":q})
+                api.PostUpdate('@' + status.user.screen_name + ' Unknown identifier.', in_reply_to_status_id = status.id)
+                print str(i)+' Unknown identifier.'
+                # continue
+                exit()
+                
+        
 
 x = TweetListen()
