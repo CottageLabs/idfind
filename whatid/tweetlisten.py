@@ -10,6 +10,7 @@ import whatid.dao
 import whatid.identifier
 
 class TweetListen(object):
+    homeurl = 'http://localhost:5001/'
     def __init__(self):
         credentials = whatid.dao.TwitterCredentials.query(q='*')
         
@@ -20,7 +21,7 @@ class TweetListen(object):
         access_token_secret = credentials['hits']['hits'][0]['_source']['access_token_secret']
         )
                 
-        regex = re.compile("@emanuil_tolev (.+)", re.IGNORECASE)
+        regex = re.compile("@emanuil_twitdev (.+)", re.IGNORECASE)
         i = 0
         
         mentions = api.GetMentions()
@@ -30,12 +31,14 @@ class TweetListen(object):
         match = regex.search(status.text)
         if match:
             q = match.group(1)
+            print q
             # check the storage of identifiers, if already there, respond. else find it.
-            # identifier = whatid.dao.Identifier.query(q=q)
-            # if identifier['hits']['total'] != 0:
-                # print str(i)+' Got it! From the storage.'
-                # # continue
-                # exit()
+            identifier = whatid.dao.Identifier.query(q=q)
+            if identifier['hits']['total'] != 0:
+                api.PostUpdate('@' + status.user.screen_name + ' ' + self.homeurl + 'identifier/' + q, in_reply_to_status_id = status.id)
+                print str(i)+' Got it! From the storage.'
+                # continue
+                exit()
 
             ident = whatid.identifier.Identificator()
             answer = ident.identify(q)
@@ -48,8 +51,19 @@ class TweetListen(object):
                 result['identifier'] = q
                 whatid.dao.Identifier.upsert(result)
                 
-                #api.PostUpdate(result, in_reply_to_status_id = status.id)
-                print 'Got it! Engine ident.'
+                tweetreply = '@' + status.user.screen_name + ' '
+                
+                if result['url_prefix']:
+                    tweetreply += result['url_prefix']
+                    tweetreply += q
+                    # We can't have a URL Suffix ONLY, can we?
+                    if result['url_suffix']:
+                        tweetreply += result['url_suffix']
+                
+                tweetreply += ' ' + self.homeurl + 'identifier/' + q
+                
+                api.PostUpdate(tweetreply, in_reply_to_status_id = status.id)
+                print str(i)+' Got it! Engine ident.'
                 # continue
                 exit()
             else:
@@ -58,7 +72,8 @@ class TweetListen(object):
                 print str(i)+' Unknown identifier.'
                 # continue
                 exit()
-                
+        else:
+            print 'No matches'
         
 
 x = TweetListen()
