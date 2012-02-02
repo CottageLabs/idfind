@@ -6,13 +6,14 @@ it tries to identify it and passes back the result as a tweet'''
 
 import twitter
 import re
+from time import sleep
 import whatid.dao
 import whatid.identifier
 
 class TweetListen(object):
     api = None
     homeurl = 'http://localhost:5001/'
-    regexstr = '@emanuil_twitdev (.+)'
+    check_for = '@emanuil_twitdev (.+)'
     def __init__(self):
         credentials = whatid.dao.TwitterCredentials.query(q='*')
         
@@ -24,11 +25,12 @@ class TweetListen(object):
         )
     
     def listen(self):
-        regex = re.compile(self.regexstr, re.IGNORECASE)
+        regex = re.compile(self.check_for, re.IGNORECASE)
         i = 0 # debugging only
         
         while True:
             mentions = self.api.GetMentions()
+            # mentions = self.api.GetMentions(since_id = last_mention_id)
             
             for status in mentions:
                 i += 1
@@ -83,7 +85,7 @@ class TweetListen(object):
                 else:
                     print str(i)+ ' ' + status.text + 'No matches.'
             
-            sleep(60) # seconds
+            sleep(61) # sleep a minute - make sure we are not getting cached responses from the python-twitter library
 
 x = TweetListen()
 x.listen()
