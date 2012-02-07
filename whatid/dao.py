@@ -151,5 +151,8 @@ class Account(DomainObject, UserMixin):
         colls = [ Collection(**item['_source']) for item in colls['hits']['hits'] ]
         return colls
         
-class TwitterCredentials(DomainObject):
+class TwitterCreds(DomainObject):
     __type__ = 'twittercreds'
+
+class TwitterLastID(DomainObject):
+    __type__ = 'twitterlastid'
