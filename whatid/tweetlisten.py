@@ -18,20 +18,22 @@ class TweetListen(object):
     def __init__(self):
         credentials = whatid.dao.TwitterCreds.query(q='*')
         
-
-        self.api = twitter.Api(
-        consumer_key = credentials['hits']['hits'][0]['_source']['consumer_key'],
-        consumer_secret = credentials['hits']['hits'][0]['_source']['consumer_secret'],
-        access_token_key = credentials['hits']['hits'][0]['_source']['access_token_key'],
-        access_token_secret = credentials['hits']['hits'][0]['_source']['access_token_secret']
-        )
+        if credentials['hits']['total'] != 0:
+            self.api = twitter.Api(
+            consumer_key = credentials['hits']['hits'][0]['_source']['consumer_key'],
+            consumer_secret = credentials['hits']['hits'][0]['_source']['consumer_secret'],
+            access_token_key = credentials['hits']['hits'][0]['_source']['access_token_key'],
+            access_token_secret = credentials['hits']['hits'][0]['_source']['access_token_secret']
+            )
+        else:
+            raise Exception('Oops, you need to index the twitter credentials into elasticsearch first!')
 
     def save_lastid(self, last_proc_tweet):
         
         upsertthis = {
             "last_mention_id":last_proc_tweet,
             "id":1
-            }             
+            }
         
         whatid.dao.TwitterLastID.upsert(upsertthis)
         
