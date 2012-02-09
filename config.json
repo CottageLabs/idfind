@@ -3,7 +3,10 @@
     "service_name" : "ID Help",
 
     # provide site address URL if you need to overwrite what it might otherwise be calculated to be
-    #"SITE_URL" : "http://idhelp.cottagelabs.com"
+    #"SITE_URL" : "http://idhelp.cottagelabs.com",
+	
+	# provide tweetlisten with the base site url (but don't want to overwrite what it might otherwise be calculated to be for the rest of the code)
+	"TWEETLISTEN_BASE_URL" : "http://idhelp.cottagelabs.com",
 
     # base URL of search service
     "base_url" : "/search",
@@ -88,6 +91,8 @@
     },
 
     # identifier for how non-analyzed fields for faceting are differenetiated in the mappings
-    "facet_field" : ".exact"
+    "facet_field" : ".exact",
         
+	# twitter account name
+	"twitter_account" : "emanuil_twitdev"
 }

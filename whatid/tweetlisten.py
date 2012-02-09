@@ -9,11 +9,12 @@ import re
 from time import sleep
 import whatid.dao
 import whatid.identifier
+from whatid.config import config
 
 class TweetListen(object):
     api = None
-    homeurl = 'http://localhost:5001/'
-    check_for = '@emanuil_twitdev (.+)'
+    homeurl = config['TWEETLISTEN_BASE_URL']
+    check_for = '@' + config['twitter_account'] + ' (.+)'
     
     def __init__(self):
         credentials = whatid.dao.TwitterCreds.query(q='*')
@@ -37,8 +38,6 @@ class TweetListen(object):
         
         whatid.dao.TwitterLastID.upsert(upsertthis)
         
-        sleep(0.5) # give ES time to index it - if we query immediately after upserting, without waiting at all, there's a good chance ES won't find anything :/
-        
     def get_lastid(self):
         ids = whatid.dao.TwitterLastID.query(q='*')
             
@@ -61,7 +60,10 @@ class TweetListen(object):
             else:
                 mentions = self.api.GetMentions()
             
+            mentions.reverse()
+            
             for status in mentions:
+                # print status.created_at + '  ' + str(status.id) + '  ' + status.user.screen_name + '  ' + status.text # uncomment to see info about every tweet which is being processed
                 try:
                     match = regex.search(status.text)
                     
@@ -78,8 +80,9 @@ class TweetListen(object):
                         if identifier['hits']['total'] != 0:
                             
                             tweetreply += self.homeurl + 'identifier/' + q
-                            self.api.PostUpdate(tweetreply, in_reply_to_status_id = status.id)
                             self.save_lastid(status.id) # create/replace the ES document containing the last-processed tweet id
+                            self.api.PostUpdate(tweetreply, in_reply_to_status_id = status.id)
+                            
                             
                             print status.text + ' Got it! From the storage.'
                             continue
@@ -105,8 +108,9 @@ class TweetListen(object):
                                 
                             tweetreply += self.homeurl + 'identifier/' + q
                             
-                            self.api.PostUpdate(tweetreply, in_reply_to_status_id = status.id)
                             self.save_lastid(status.id) # create/replace the ES document containing the last-processed tweet id
+                            self.api.PostUpdate(tweetreply, in_reply_to_status_id = status.id)
+                            
                             
                             print status.text + ' Got it! Engine ident.'
                             continue
@@ -115,19 +119,20 @@ class TweetListen(object):
                             whatid.dao.Identifier.upsert({"type":"unknown","identifier":q})
                             
                             tweetreply += 'Unknown identifier.'
-                            self.api.PostUpdate(tweetreply, in_reply_to_status_id = status.id)
                             self.save_lastid(status.id) # create/replace the ES document containing the last-processed tweet id
+                            self.api.PostUpdate(tweetreply, in_reply_to_status_id = status.id)
+                            
                             
                             print status.text + ' Unknown identifier.'
                             continue
                             
                     else:
-                        print status.id + ' ' + status.text + 'This tweet doesn\'t match the format (regex): ' + self.check_for
+                        print str(status.id) + ' ' + status.text + 'This tweet doesn\'t match the format (regex): ' + self.check_for
                     
 
                 except twitter.TwitterError as error:
-                    if 'duplicate' in error.args:
-                        print status.id + ' ' + 'Got duplicate response error from Twitter.'
+                    print 'Twitter error while processing tweet (id = ' + str(status.id) + ' ); Error was: ' + error.args[0]
+                    print
                     
             sleep(61) # sleep a minute - make sure we are not getting cached responses from the python-twitter library
 
