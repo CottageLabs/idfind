@@ -53,7 +53,7 @@ class TweetListen(object):
         
         while True:
             
-            lm = self.get_lastid() # we are interested in the "last_mention_id" field of the ES hit, so that we can use it to request only the tweets we need below
+            lm = self.get_lastid()
             
             if lm:
                 mentions = self.api.GetMentions(since_id = lm)
@@ -63,14 +63,15 @@ class TweetListen(object):
             mentions.reverse()
             
             for status in mentions:
-                # print status.created_at + '  ' + str(status.id) + '  ' + status.user.screen_name + '  ' + status.text # uncomment to see info about every tweet which is being processed
+                # uncomment to see info about every tweet which is being processed
+                # print status.created_at + '  ' + str(status.id) + '  ' + status.user.screen_name + '  ' + status.text 
                 try:
                     match = regex.search(status.text)
                     
                     if match:
                         q = match.group(1)
                         
-                        print q # debug
+                        # print q # debug
                         
                         tweetreply = '@' + status.user.screen_name + ' ' # can't construct the whole string and then PostUpdate() it to Twitter at the end of the processing loop - that loop uses 'continue' in order to prevent further processing when one of the cases is hit... 
                         # yeah, it's ugly, the original code in whatid.web.identify uses an HTTP redirect and thus stops further execution, but we can't do that here, hence the continue
@@ -79,12 +80,29 @@ class TweetListen(object):
                         identifier = whatid.dao.Identifier.query(q=q)
                         if identifier['hits']['total'] != 0:
                             
-                            tweetreply += self.homeurl + 'identifier/' + q
+                            identifier_record = identifier['hits']['hits'][0]['_source']
+                            
+                            url_prefix = None
+                            url_suffix = None
+                            if 'url_prefix' in identifier_record:
+                                url_prefix = identifier_record['url_prefix']
+                            if 'url_suffix' in identifier_record:
+                                url_suffix = identifier_record['url_suffix']
+                            
+                            if url_prefix:
+                                tweetreply += url_prefix
+                                tweetreply += q
+                                # We can't have a URL Suffix ONLY, can we?
+                                if url_suffix:
+                                    tweetreply += url_suffix
+                                tweetreply += '; '
+                            
+                            tweetreply += 'info @ ' + self.homeurl + '/identifier/' + q
                             self.save_lastid(status.id) # create/replace the ES document containing the last-processed tweet id
                             self.api.PostUpdate(tweetreply, in_reply_to_status_id = status.id)
                             
                             
-                            print status.text + ' Got it! From the storage.'
+                            print 'Got it! From the storage :: ' + str(status.id) + ' "' + status.text + '"'
                             continue
 
                         ident = whatid.identifier.Identificator()
@@ -104,15 +122,15 @@ class TweetListen(object):
                                 # We can't have a URL Suffix ONLY, can we?
                                 if result['url_suffix']:
                                     tweetreply += result['url_suffix']
-                                tweetreply += ' '
+                                tweetreply += '; '
                                 
-                            tweetreply += self.homeurl + 'identifier/' + q
+                            tweetreply += 'info @ ' + self.homeurl + '/identifier/' + q
                             
                             self.save_lastid(status.id) # create/replace the ES document containing the last-processed tweet id
                             self.api.PostUpdate(tweetreply, in_reply_to_status_id = status.id)
                             
                             
-                            print status.text + ' Got it! Engine ident.'
+                            print 'Got it! Engine ident :: ' + str(status.id) + ' "' + status.text + '"'
                             continue
                             
                         else:
@@ -123,7 +141,7 @@ class TweetListen(object):
                             self.api.PostUpdate(tweetreply, in_reply_to_status_id = status.id)
                             
                             
-                            print status.text + ' Unknown identifier.'
+                            print 'Unknown identifier :: ' + str(status.id) + ' "' + status.text + '"'
                             continue
                             
                     else:
