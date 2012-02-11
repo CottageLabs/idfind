@@ -1,7 +1,7 @@
 import re
 import whatid.dao
 import urllib2
-from urllib2 import HTTPError
+from urllib2 import HTTPError, URLError
 
 class Identificator(object):
     def __init__(self): pass
@@ -53,4 +53,10 @@ class Identificator(object):
             if (e.code == 401 or e.code == 403 or e.code == 402
                 or e.code == 406 or e.code == 407):
                 return True
+            return False
+        except URLError as e:
+            # URL most probably doesn't exist
+            # but could be caused by other connection errors
+            # TODO: better handling of the generic URLError-s that urllib2 can raise
+            # note: don't use e.code for URLError-s like you might for HTTPError-s, that's not always available (like in the case where the URL supplied with the ID test just doesn't exist)
             return False
