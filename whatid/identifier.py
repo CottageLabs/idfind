@@ -45,7 +45,7 @@ class Identificator(object):
     
     def _check_service(self, identifier, r):
         url =  r['url_prefix'] + identifier + r['url_suffix']
-        print url
+        # print url
         try:
             urllib2.urlopen(url)
             return True
