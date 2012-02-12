@@ -55,8 +55,7 @@ class Identificator(object):
                 return True
             return False
         except URLError as e:
-            # URL most probably doesn't exist
-            # but could be caused by other connection errors
-            # TODO: better handling of the generic URLError-s that urllib2 can raise
-            # note: don't use e.code for URLError-s like you might for HTTPError-s, that's not always available (like in the case where the URL supplied with the ID test just doesn't exist)
-            return False
+            # URL doesn't exist
+            # (somebody has to check whether that particular code could mean other things like connection errors - I couldn't find a list of URLError code meanings... TODO
+            if e.reason[0] == 11001:
+                return False
