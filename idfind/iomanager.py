@@ -1,14 +1,14 @@
 import urllib2
 from copy import deepcopy
-import whatid.dao
-import whatid.config
+import idfind.dao
+import idfind.config
 
 class IOManager(object):
     def __init__(self, results, args={}, path=""):
         self.results = results
         self.args = args
         self.path = path
-        self.config = whatid.config.Config()
+        self.config = idfind.config.Config()
 
 
     def get_q(self):
@@ -25,10 +25,10 @@ class IOManager(object):
     '''get all currently available keys in ES'''
     def get_keys(self,rectype='Regex'):
         if rectype == 'Record':
-            res = whatid.dao.Record.get_mapping()
+            res = idfind.dao.Record.get_mapping()
             which = 'record'
         elif rectype == 'Collection':
-            res = whatid.dao.Collection.get_mapping()
+            res = idfind.dao.Collection.get_mapping()
             which = 'collection'
         keys = [str(i) for i in res[which]['properties'].keys()]
         keys.sort()
@@ -57,9 +57,9 @@ class IOManager(object):
         for item in fields:
             try:
                 if rectype == 'Record':
-                    whatid.dao.Record.query(sort={item+self.config.facet_field: {"order":"asc"}})
+                    idfind.dao.Record.query(sort={item+self.config.facet_field: {"order":"asc"}})
                 elif rectype == 'Collection':
-                    whatid.dao.Collection.query(sort={item: {"order":"asc"}})
+                    idfind.dao.Collection.query(sort={item: {"order":"asc"}})
                 sortfields.append(item)
             except:
                 pass

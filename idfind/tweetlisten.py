@@ -7,9 +7,9 @@ it tries to identify it and passes back the result as a tweet'''
 import twitter
 import re
 from time import sleep
-import whatid.dao
-import whatid.identifier
-from whatid.config import config
+import idfind.dao
+import idfind.identifier
+from idfind.config import config
 
 class TweetListen(object):
     api = None
@@ -17,7 +17,7 @@ class TweetListen(object):
     check_for = '@' + config['twitter_account'] + ' (.+)'
     
     def __init__(self):
-        credentials = whatid.dao.TwitterCreds.query(q='*')
+        credentials = idfind.dao.TwitterCreds.query(q='*')
         
         if credentials['hits']['total'] != 0:
             self.api = twitter.Api(
@@ -36,10 +36,10 @@ class TweetListen(object):
             "id":1
             }
         
-        whatid.dao.TwitterLastID.upsert(upsertthis)
+        idfind.dao.TwitterLastID.upsert(upsertthis)
         
     def get_lastid(self):
-        ids = whatid.dao.TwitterLastID.query(q='*')
+        ids = idfind.dao.TwitterLastID.query(q='*')
             
         lm = None
         
@@ -74,10 +74,10 @@ class TweetListen(object):
                         # print q # debug
                         
                         tweetreply = '@' + status.user.screen_name + ' ' # can't construct the whole string and then PostUpdate() it to Twitter at the end of the processing loop - that loop uses 'continue' in order to prevent further processing when one of the cases is hit... 
-                        # yeah, it's ugly, the original code in whatid.web.identify uses an HTTP redirect and thus stops further execution, but we can't do that here, hence the continue
+                        # yeah, it's ugly, the original code in idfind.web.identify uses an HTTP redirect and thus stops further execution, but we can't do that here, hence the continue
                     
                         # check the storage of identifiers, if already there, respond. else find it.
-                        identifier = whatid.dao.Identifier.query(q=q)
+                        identifier = idfind.dao.Identifier.query(q=q)
                         if identifier['hits']['total'] != 0:
                             
                             identifier_record = identifier['hits']['hits'][0]['_source']
@@ -105,16 +105,16 @@ class TweetListen(object):
                             print 'Got it! From the storage :: ' + str(status.id) + ' "' + status.text + '"'
                             continue
 
-                        ident = whatid.identifier.Identificator()
+                        ident = idfind.identifier.Identificator()
                         answer = ident.identify(q)
                         if answer:
                             # save the identifier with its type, and add to the success rate of the test
                             result = answer[0]
-                            #obj = whatid.dao.Test.get(answer[0]['id'])
+                            #obj = idfind.dao.Test.get(answer[0]['id'])
                             #obj['matches'] = obj.get('matches',0) + 1
                             #obj.save()
                             result['identifier'] = q
-                            whatid.dao.Identifier.upsert(result)
+                            idfind.dao.Identifier.upsert(result)
                             
                             if result['url_prefix']:
                                 tweetreply += result['url_prefix']
@@ -134,7 +134,7 @@ class TweetListen(object):
                             continue
                             
                         else:
-                            whatid.dao.Identifier.upsert({"type":"unknown","identifier":q})
+                            idfind.dao.Identifier.upsert({"type":"unknown","identifier":q})
                             
                             tweetreply += 'Unknown identifier.'
                             self.save_lastid(status.id) # create/replace the ES document containing the last-processed tweet id

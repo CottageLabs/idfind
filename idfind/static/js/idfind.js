@@ -3,10 +3,10 @@ jQuery(document).ready(function() {
 
     // clear the title from the front page search box
     if (jQuery('.frontin').val() == "") {
-        jQuery('.frontin').val("/^(IDHelp).*?$/");
+        jQuery('.frontin').val("/^(IDFind).*?$/");
     }
     var clearit = function(event) {
-        if (jQuery(this).val() == "/^(IDHelp).*?$/") {
+        if (jQuery(this).val() == "/^(IDFind).*?$/") {
             jQuery(this).val("");
         }
     }

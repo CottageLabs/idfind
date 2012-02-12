@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name = 'whatid',
+    name = 'idfind',
     version = '0.1',
     packages = find_packages(),
     install_requires = [
@@ -10,10 +10,10 @@ setup(
         "Flask-WTF",
         "pyes==0.16"
 				],
-    url = 'http://whatid.cottagelabs.com/',
+    url = 'http://idfind.cottagelabs.com/',
     author = 'Cottage Labs',
     author_email = 'mark@cottagelabs.com',
-    description = 'WhatID - find out what ID you have, and what you can do with it',
+    description = 'idfind - find out what ID you have, and what you can do with it',
     license = 'AGPL',
     classifiers = [
         'Development Status :: 3 - Alpha',

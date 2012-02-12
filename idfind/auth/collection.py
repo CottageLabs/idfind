@@ -1,4 +1,4 @@
-from whatid.core import current_user
+from idfind.core import current_user
 
 def read(account, collection):
     return True

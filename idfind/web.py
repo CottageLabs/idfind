@@ -3,13 +3,13 @@ from flask import render_template, flash
 from flask.views import View, MethodView
 from flaskext.login import login_user, current_user
 
-import whatid.identifier
-import whatid.dao
-import whatid.iomanager
-import whatid.importer
-from whatid.core import app, login_manager
-from whatid.view.account import blueprint as account
-from whatid import auth
+import idfind.identifier
+import idfind.dao
+import idfind.iomanager
+import idfind.importer
+from idfind.core import app, login_manager
+from idfind.view.account import blueprint as account
+from idfind import auth
 
 app.register_blueprint(account, url_prefix='/account')
 
@@ -17,7 +17,7 @@ app.register_blueprint(account, url_prefix='/account')
 # NB: the decorator appears to kill the function for normal usage
 @login_manager.user_loader
 def load_account_for_login_manager(userid):
-    out = whatid.dao.Account.get(userid)
+    out = idfind.dao.Account.get(userid)
     return out
 
 @app.context_processor
@@ -30,14 +30,14 @@ def standard_authentication():
     """Check remote_user on a per-request basis."""
     remote_user = request.headers.get('REMOTE_USER', '')
     if remote_user:
-        user = whatid.dao.Account.get(remote_user)
+        user = idfind.dao.Account.get(remote_user)
         if user:
             login_user(user, remember=False)
     # add a check for provision of api key
     elif 'api_key' in request.values:
-        res = whatid.dao.Account.query(q='api_key:"' + request.values['api_key'] + '"')['hits']['hits']
+        res = idfind.dao.Account.query(q='api_key:"' + request.values['api_key'] + '"')['hits']['hits']
         if len(res) == 1:
-            user = whatid.dao.Account.get(res[0]['_source']['id'])
+            user = idfind.dao.Account.get(res[0]['_source']['id'])
             if user:
                 login_user(user, remember=False)
 
@@ -80,7 +80,7 @@ def regex(rid=None):
     elif JSON:
         return outputJSON(results=res, coll=cid, record=True)
     else:
-        io = whatid.iomanager.IOManager(res)
+        io = idfind.iomanager.IOManager(res)
         return render_template('test.html', io=io)
 
 
@@ -104,7 +104,7 @@ def identifier(iid=None):
     elif JSON:
         return outputJSON(results=res, coll=cid, record=True)
     else:
-        io = whatid.iomanager.IOManager(res)
+        io = idfind.iomanager.IOManager(res)
         return render_template('identifier.html', io=io)
 
 
@@ -128,7 +128,7 @@ def description(did=None):
     elif JSON:
         return outputJSON(results=res, coll=cid, record=True)
     else:
-        io = whatid.iomanager.IOManager(res)
+        io = idfind.iomanager.IOManager(res)
         return render_template('description.html', io=io)
 
 
@@ -142,23 +142,23 @@ def identify(therest=''):
     q = request.values.get('q','').strip('"')
     if q:
         # check the storage of identifiers, if already there, respond. else find it.
-        identifier = whatid.dao.Identifier.query(q=q)
+        identifier = idfind.dao.Identifier.query(q=q)
         if identifier['hits']['total'] != 0:
             flash('We already have that one!')
             return redirect('/identifier/'+q)
 
-        ident = whatid.identifier.Identificator()
+        ident = idfind.identifier.Identificator()
         answer = ident.identify(q)
         if answer:
             # save the identifier with its type, and add to the success rate of the test
             result = answer[0]
-            #obj = whatid.dao.Test.get(answer[0]['id'])
+            #obj = idfind.dao.Test.get(answer[0]['id'])
             #obj['matches'] = obj.get('matches',0) + 1
             #obj.save()
             result['identifier'] = q
-            whatid.dao.Identifier.upsert(result)
+            idfind.dao.Identifier.upsert(result)
         else:
-            whatid.dao.Identifier.upsert({"type":"unknown","identifier":q})
+            idfind.dao.Identifier.upsert({"type":"unknown","identifier":q})
         if JSON:
             return outputJSON(results=answer)
         else:
@@ -187,7 +187,7 @@ class RateView(MethodView):
     def post(self):
         if not auth.collection.create(current_user, None):
             abort(401)
-        importer = whatid.importer.Importer(owner=current_user)
+        importer = idfind.importer.Importer(owner=current_user)
         importer.rate(request)
         flash('Successfully received your rating')
         return redirect('/account/%s/' % current_user.id)
@@ -212,7 +212,7 @@ class SubmitView(MethodView):
             abort(401)
         # TODO: need some better validation. see python flask docs for info.
         if 'test_or_desc' in request.values:
-            importer = whatid.importer.Importer(owner=current_user)
+            importer = idfind.importer.Importer(owner=current_user)
             importer.submit(request)
             flash('Successfully received %s' % request.values.get("test_or_desc"))
             return redirect('/')
@@ -230,17 +230,17 @@ def record(path):
         path = path.replace(".json","")
         JSON = True
 
-    res = whatid.dao.Test.query(q='id:"' + path + '"')
+    res = idfind.dao.Test.query(q='id:"' + path + '"')
 
     if res["hits"]["total"] == 0:
         abort(404)
     elif JSON:
         return outputJSON(results=res, coll=cid, record=True)
     elif res["hits"]["total"] != 1:
-        io = whatid.iomanager.IOManager(res)
+        io = idfind.iomanager.IOManager(res)
         return render_template('record.html', io=io, multiple=True)
     else:
-        io = whatid.iomanager.IOManager(res)
+        io = idfind.iomanager.IOManager(res)
         return render_template('record.html', io=io)
 
 
@@ -254,7 +254,7 @@ def search(path=''):
 
 
 # twitter
-# some way of catching stuff sent to whatid via twitter, and returning it
+# some way of catching stuff sent to idfind via twitter, and returning it
 # must be plenty of easy ways to check a twitter stream, then can just parse out the request details
 # can build response out of the other sections
 
@@ -285,12 +285,12 @@ def dosearch(path,searchtype='identifier'):
         args['q'] = implicit_value
 
     if searchtype == 'identifier' or implicit_key == 'identifier':
-        results = whatid.dao.Identifier.query(**args)
+        results = idfind.dao.Identifier.query(**args)
     if searchtype == 'test' or implicit_key == 'test':
-        results = whatid.dao.Test.query(**args)
+        results = idfind.dao.Test.query(**args)
     if searchtype == 'description' or implicit_key == 'description':
-        results = whatid.dao.Description.query(**args)
-    return whatid.iomanager.IOManager(results, args)
+        results = idfind.dao.Description.query(**args)
+    return idfind.iomanager.IOManager(results, args)
 
 
 def outputJSON(results, record=False):
@@ -307,6 +307,6 @@ def outputJSON(results, record=False):
     return resp
 
 if __name__ == "__main__":
-    whatid.dao.init_db()
+    idfind.dao.init_db()
     app.run(host='0.0.0.0', port=5001, debug=True)
 

@@ -2,8 +2,8 @@ import urllib2
 from datetime import datetime
 from cStringIO import StringIO
 
-import whatid.dao
-import whatid.util as util
+import idfind.dao
+import idfind.util as util
 
 class Importer(object):
     def __init__(self, owner):
@@ -46,7 +46,7 @@ class Importer(object):
         }
         
         if request.values["test_or_desc"] == "test":
-            whatid.dao.Test.upsert(record)
+            idfind.dao.Test.upsert(record)
         if request.values["test_or_desc"] == "description":
-            whatid.dao.Description.upsert(record)
+            idfind.dao.Description.upsert(record)
         

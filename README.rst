@@ -1,12 +1,12 @@
-WhatID - Got an ID? Not sure what it is? What you can do with it? Well, use this!
+idfind - Got an ID? Not sure what it is? What you can do with it? Well, use this!
 
-More info: http://idhelp.cottagelabs.com
+More info: http://idfind.cottagelabs.com
 
 
 How It Works
 ============
 
-Up and running at http://idhelp.cottagelabs.com
+Up and running at http://idfind.cottagelabs.com
 
 
 Install
@@ -26,17 +26,17 @@ Install
 
     # by convention we put it in the virtualenv but you can put anywhere
     mkdir {myenv}/src
-    git clone https://github.com/cottagelabs/whatid {myenv}/src/
+    git clone https://github.com/cottagelabs/idfind {myenv}/src/
 
 3. Install the app::
 
-    cd {myenv}/src/whatid
+    cd {myenv}/src/idfind
     # for dev install:
     pip install -e .
 
 4. Run the webserver::
 
-    python whatid/web.py
+    python idfind/web.py
 
 .. _ElasticSearch: http://www.elasticsearch.org/
 

@@ -17,7 +17,7 @@ def init_db():
 
 def get_conn():
     host = "127.0.0.1:9200"
-    db_name = "idhelp"
+    db_name = "idfind"
     conn = pyes.ES([host])
     return conn, db_name
 
@@ -72,7 +72,7 @@ class DomainObject(UserDict.IterableUserDict):
     @classmethod
     def delete_by_query(cls, query):
         url = "127.0.0.1:9200"
-        loc = whatid + "/" + cls.__type__ + "/_query?q=" + query
+        loc = idfind + "/" + cls.__type__ + "/_query?q=" + query
         conn = httplib.HTTPConnection(url)
         conn.request('DELETE', loc)
         resp = conn.getresponse()
@@ -117,7 +117,7 @@ class DomainObject(UserDict.IterableUserDict):
             return msg
 
         host = "127.0.0.1:9200"
-        db_path = "idhelp"
+        db_path = "idfind"
         fullpath = '/' + db_path + '/' + self.__type__ + '/_search' + '?' + query_string
         c =  httplib.HTTPConnection(host)
         c.request('GET', fullpath)

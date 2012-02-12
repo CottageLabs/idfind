@@ -1,5 +1,5 @@
 import re
-import whatid.dao
+import idfind.dao
 import urllib2
 from urllib2 import HTTPError, URLError
 
@@ -11,7 +11,7 @@ class Identificator(object):
         # get all of the regular expressions
         d = {'start' : 0, 'size' : 100};
         while True:
-            regexes = whatid.dao.Test.query(**d)
+            regexes = idfind.dao.Test.query(**d)
             if len(regexes['hits']['hits']) == 0:
                 break
             d = {'start' : d['start'] + d['size'], 'size' : 100}

@@ -5,7 +5,7 @@ from flask import render_template
 from flaskext.login import login_user, logout_user
 from flaskext.wtf import Form, TextField, PasswordField, validators
 
-import whatid.dao as dao
+import idfind.dao as dao
 
 blueprint = Blueprint('account', __name__)
 

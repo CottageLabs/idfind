@@ -1,19 +1,19 @@
 {
     # service
-    "service_name" : "ID Help",
+    "service_name" : "ID Find",
 
     # provide site address URL if you need to overwrite what it might otherwise be calculated to be
-    #"SITE_URL" : "http://idhelp.cottagelabs.com",
+    #"SITE_URL" : "http://idfind.cottagelabs.com",
 	
 	# provide tweetlisten with the base site url (but don't want to overwrite what it might otherwise be calculated to be for the rest of the code)
-	"TWEETLISTEN_BASE_URL" : "http://idhelp.cottagelabs.com",
+	"TWEETLISTEN_BASE_URL" : "http://idfind.cottagelabs.com",
 
     # base URL of search service
     "base_url" : "/search",
 
     # elasticsearch settings
     "ELASTIC_SEARCH_HOST" : "127.0.0.1:9200",
-    "ELASTIC_SEARCH_DB" : "idhelp",
+    "ELASTIC_SEARCH_DB" : "idfind",
 
     # default results and paging options
     "results_per_page" : 10,
