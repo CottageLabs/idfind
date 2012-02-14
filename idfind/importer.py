@@ -13,10 +13,11 @@ class Importer(object):
         '''Import an identifer test or description into the index.'''
         
         pre = request.values.get("url_prefix",'')
-        if not pre.endswith('/'):
-            pre += '/'
-        if not ( pre.startswith('http://') or pre.startswith('https://') ):
-            pre = 'http://' + pre
+        if pre:
+            if not pre.endswith('/'):
+                pre += '/'
+            if not ( pre.startswith('http://') or pre.startswith('https://') ):
+                pre = 'http://' + pre
         
         resptest = request.values.get("resptest",'')
         if resptest != '':
