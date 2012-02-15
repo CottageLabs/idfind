@@ -20,7 +20,7 @@
             {% if item['url_prefix'] %}
                 <p>Find it here: <a href="{{item['url_prefix']}}{{string}}{{item['url_suffix']}}">{{item['url_prefix']}}{{string}}{{item['url_suffix']}}</a></p>
             {% endif %}
-            {% if item['useful_links'] %}
+            {% if item['useful_links'][0] %}
                 <p>Learn more</p>
                 <ul>
                 {% for link in item['useful_links'] %}
@@ -37,7 +37,7 @@
     
         <h2>We don't know!</h2>
         
-        <p>Why not <a href="/">submit</a> an identifier test for it?</p>
+        <p>Why not <a href="/submit">submit</a> an identifier test for it?</p>
     
     {% endif %}
 
