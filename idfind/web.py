@@ -131,15 +131,20 @@ def description(did=None):
         io = idfind.iomanager.IOManager(res)
         return render_template('description.html', io=io)
 
-
 @app.route('/identify', methods=['GET','POST'])
-@app.route('/identify<therest>', methods=['GET','POST'])
+@app.route('/identify/<therest>', methods=['GET','POST'])
 def identify(therest=''):
     JSON = False
-    if therest.endswith(".json") or request.values.get('format',"") == "json":
-        JSON = True
-        
-    q = request.values.get('q','').strip('"')
+    
+    if therest:
+        q = therest
+    else:
+        q = request.values.get('q','').strip('"')
+    
+    if q.endswith(".json") or request.values.get('format',"") == "json":
+            JSON = True
+            q = q.rstrip('.json')
+            
     if q:
         # check the storage of identifiers, if already there, respond. else find it.
         identifier = idfind.dao.Identifier.query(q=q)
@@ -163,7 +168,7 @@ def identify(therest=''):
             return outputJSON(results=answer)
         else:
             return render_template('answer.html',answer=answer,string=q)
-
+    
     return render_template('identify.html')
 
 
