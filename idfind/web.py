@@ -265,7 +265,10 @@ def search(path=''):
 
 
 def dosearch(path,searchtype='identifier'):
+    # prevent UnboundLocalError: local variable X referenced before assignment errors by initialising some variables
     args = {}
+    implicit_key = None
+    
     if 'from' in request.values:
         args['start'] = request.values.get('from')
     if 'size' in request.values:
