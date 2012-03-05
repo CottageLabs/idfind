@@ -14,7 +14,7 @@ Install
 
 1. Install stuff:
    
-   * ElasticSearch_ (0.17 series)
+   * ElasticSearch_ (0.19 series) (tested and should run on 0.17 and up)
 
 2. [optional] Create a virtualenv and enable it::
 
