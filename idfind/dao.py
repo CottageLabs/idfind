@@ -79,13 +79,15 @@ class DomainObject(UserDict.IterableUserDict):
         return resp.read()
         
     @classmethod
-    def query(cls, q='', terms=None, facet_fields=None, flt=False, **kwargs):
+    def query(cls, q='', terms=None, facet_fields=None, flt=False, notq=False, **kwargs):
         '''Perform a query on backend.
 
         :param q: maps to query_string parameter.
         :param terms: dictionary of terms to filter on. values should be lists.
+        :param facet_fields: we need a proper comment on this TODO
         :param kwargs: any keyword args as per
             http://www.elasticsearch.org/guide/reference/api/search/uri-request.html
+        :param notq: is this an "inverted" query - match all documents BUT the ones specified by the query
         '''
         conn, db = get_conn()
         if not q:
@@ -95,12 +97,33 @@ class DomainObject(UserDict.IterableUserDict):
                 ourq = pyes.query.FuzzyLikeThisQuery(like_text=q,**kwargs)
             else:
                 ourq = pyes.query.StringQuery(q, default_operator='AND')
+        
+        a,b,c=0,0,0
+        a += 1
+        print str(a) + '.'
+        print terms
         if terms:
             for term in terms:
+                b += 1
+                print str(a) + '.' + str(b) + '.'
+                print term
                 for val in terms[term]:
+                    c += 1
+                    print str(a) + '.' + str(b) + '.' + str(c) + '.'+val
                     termq = pyes.query.TermQuery(term, val)
                     ourq = pyes.query.BoolQuery(must=[ourq,termq])
-
+        
+        # get an "inverted" or "negative" query - all hits BUT the ones found by the originally specified query
+        # we can do this with BoolQuery apparently, but elasticsearch.org recommends a Not filter as faster, so that's what we'll try
+        if notq:
+            maq = pyes.query.MatchAllQuery() # the "all hits" bit
+            # we can't use a NotFilter with a query, since that will only take another Filter
+            # so we need a QueryFilter to make this abstract enough to handle any query ourq might be
+            qf = pyes.filters.QueryFilter(ourq) # we wrap the original query in a QueryFilter...
+            nf = pyes.filters.NotFilter(qf) # and can now use a fast NotFilter with it
+            ourq = pyes.query.FilteredQuery(maq, nf) # replace the original query with our "inverted" one
+        f = open ("debug.json", 'w')
+        f.write(ourq.to_query_json())
         ourq = ourq.search(**kwargs)
         if facet_fields:
             for item in facet_fields:
@@ -133,6 +156,14 @@ class Description(DomainObject):
 	
 class Identifier(DomainObject):
     __type__ = 'identifier'
+    
+    @classmethod
+    def query(cls, q='', terms=None, facet_fields=None, flt=False, notq=False, **kwargs):
+        # TODO - check if that how you pass keyword arguments on to another function, EET
+        # print kwargs
+        
+        # perhaps sometimes we WILL want all the unknowns, so we might want to write another method for that, or maybe *not* override query
+        return DomainObject.query(q, {'name':['DOI']}, facet_fields, flt, notq=True, **kwargs)
 
 class Account(DomainObject, UserMixin):
     __type__ = 'account'
