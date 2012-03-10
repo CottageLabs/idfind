@@ -84,6 +84,7 @@ class DomainObject(UserDict.IterableUserDict):
 
         :param q: maps to query_string parameter.
         :param terms: dictionary of terms to filter on. values should be lists.
+        :param facet_fields: we need a proper comment on this TODO
         :param kwargs: any keyword args as per
             http://www.elasticsearch.org/guide/reference/api/search/uri-request.html
         '''
@@ -95,12 +96,13 @@ class DomainObject(UserDict.IterableUserDict):
                 ourq = pyes.query.FuzzyLikeThisQuery(like_text=q,**kwargs)
             else:
                 ourq = pyes.query.StringQuery(q, default_operator='AND')
+        
         if terms:
             for term in terms:
                 for val in terms[term]:
                     termq = pyes.query.TermQuery(term, val)
                     ourq = pyes.query.BoolQuery(must=[ourq,termq])
-
+        
         ourq = ourq.search(**kwargs)
         if facet_fields:
             for item in facet_fields:
@@ -133,6 +135,9 @@ class Description(DomainObject):
 	
 class Identifier(DomainObject):
     __type__ = 'identifier'
+
+class UIdentifier(DomainObject):
+    __type__ = 'uidentifier'
 
 class Account(DomainObject, UserMixin):
     __type__ = 'account'
