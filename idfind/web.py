@@ -258,12 +258,6 @@ def search(path=''):
         return render_template('search/index.html', io=io)
 
 
-# twitter
-# some way of catching stuff sent to idfind via twitter, and returning it
-# must be plenty of easy ways to check a twitter stream, then can just parse out the request details
-# can build response out of the other sections
-
-
 def dosearch(path,searchtype='identifier'):
     # prevent UnboundLocalError: local variable X referenced before assignment errors by initialising some variables
     args = {}
