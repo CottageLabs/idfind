@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="action_box">
+	<h1>Tests we use to identify identifiers</h1>
+	<p><a href="/submit">Submit a new one and see it appear on this page!</a></p>
+
+     {% if things %}
+		{% for thing in things %}
+		
+			{# Print headings: 
+			print 'Tests' if the current item is a test and we've not printed 'Tests' before
+			
+			print 'Descriptions' for the same conditions
+			
+			They are guaranteed to be a continous list of tests and then descriptions (which one is first doesn't matter). #}
+			
+			{% if thing['_type'] == 'test' %}
+				{% if curtype != 'Tests' %}
+					{% set curtype = 'Tests' %}
+					<h2>{{curtype}}</h2>
+				{% endif %}
+				
+			{% elif thing['_type'] == 'description' %}
+				{% if curtype != 'Descriptions' %}
+					{% set curtype = 'Descriptions' %}
+					<h2>{{curtype}}</h2>
+				{% endif %}
+			{% endif %}
+			<div>
+			
+				{# If we want to be able to link to each test/descr. on this page we need to provide a link. Linking to the <h3> title doesn't work well, because the fixed navigation bar always covers it. So we need an invisible anchor ABOVE the title. #}
+				<a name="{{thing['_source']['name']}}" style="line-height:3.5em;">&nbsp;</a>
+				<h3>{{thing['_source']['name']}} <small><a alt="Copy this - direct link to this item on this page" href="#{{thing['_source']['name']}}">#</a></small></h3>
+				
+				<table>
+					
+					<!-- sets the visuals of the table and so is always displayed, even if description is empty -->
+					<tr><td width="15%">Description</td><td>{{thing['_source']['description']}}</td></tr>
+					
+					{% if thing['_source']['regex'] %}<tr><td>Regular expression</td><td>{{thing['_source']['regex']}}</td></tr>{% endif %}
+					
+					{% if thing['_source']['url_prefix'] %}<tr><td>Service URL prefix</td><td>{{thing['_source']['url_prefix']}}</td></tr>{% endif %}
+					
+					{% if thing['_source']['url_suffix'] %}<tr><td>Service URL suffix</td><td>{{thing['_source']['url_suffix']}}</td></tr>{% endif %}
+					
+					{% if thing['_source']['resptest'] %}<tr><td>Response condition</td><td>{{thing['_source']['resptest_type']}} {{thing['_source']['resptest_cond']}} {{thing['_source']['resptest']}}</td></tr>{% endif %}
+					
+					{% if thing['_source']['useful_links'][0] %}
+						<tr>
+							<td>Learn more</td>
+							<td>
+							<ul>
+							{% for link in thing['_source']['useful_links'] %}
+								<li><a href="{{link}}">{{link}}</a></li>
+							{% endfor %}
+							</ul>
+							</td>
+						</tr>
+					{% endif %}
+					
+					{% if thing['_source']['tags'][0] %}
+						<tr>
+							<td>Tags</td>
+							<td>
+							{{ thing['_source']['tags']|join(', ') }}
+							</td>
+						</tr>
+					{% endif %}
+					
+					{% if thing['_source']['owner'] %}<tr><td>Submitted by</td><td>{{thing['_source']['owner']}}</td></tr>{% endif %}
+				</table>
+				
+			</div>
+		{% endfor %}
+<!--
+        <table>
+        {% for item in answer %}
+            <tr><td>
+            <h3>{{item['name']}}</h3>
+            <p>{{item['description']}}</p>
+            </td>
+            <td class="span6">
+            {% if item['url_prefix'] %}
+                <p>Find it here: <a href="{{item['url_prefix']}}{{string}}{{item['url_suffix']}}">{{item['url_prefix']}}{{string}}{{item['url_suffix']}}</a></p>
+            {% endif %}
+            {% if item['useful_links'][0] %}
+                <p>Learn more</p>
+                <ul>
+                {% for link in item['useful_links'] %}
+                    <li><a href="{{link}}">{{link}}</a></li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+            </td>
+            </tr>
+        {% endfor %}
+        </table>
+        
+    {% else %}
+    
+        <h2>We don't know!</h2>
+        
+        <p>Why not <a href="/submit">submit</a> an identifier thing for it?</p>
+    -->
+    {% endif %} 
+
+</div>
+{% endblock %}
+

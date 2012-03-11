@@ -172,6 +172,18 @@ def identify(therest=''):
     return render_template('identify.html')
 
 
+    
+@app.route('/browse', methods=['GET'])
+def browse():
+    tests = idfind.dao.Test.query() # get all the tests
+    tests = tests['hits']['hits']
+    
+    descs = idfind.dao.Description.query() # get all the descriptions
+    descs = descs['hits']['hits']
+    
+    return render_template('browse.html', things=tests+descs)
+
+
 @app.route('/parse', methods=['GET','POST'])
 def parse():
     pass
