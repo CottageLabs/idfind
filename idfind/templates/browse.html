@@ -2,10 +2,10 @@
 
 {% block content %}
 <div class="action_box">
-	<h1>Tests we use to identify identifiers</h1>
+	<h1>Tests and descriptions we use to identify identifiers</h1>
 	<p><a href="/submit">Submit a new one and see it appear on this page!</a></p>
 
-     {% if things %}
+    {% if things %}
 		{% for thing in things %}
 		
 			{# Print headings: 
@@ -33,7 +33,7 @@
 			
 				{# If we want to be able to link to each test/descr. on this page we need to provide a link. Linking to the <h3> title doesn't work well, because the fixed navigation bar always covers it. So we need an invisible anchor ABOVE the title. #}
 				<a name="{{thing['_source']['name']}}" style="line-height:3.5em;">&nbsp;</a>
-				<h3>{{thing['_source']['name']}} <small><a alt="Copy this - direct link to this item on this page" href="#{{thing['_source']['name']}}">#</a></small></h3>
+				<h3>{{thing['_source']['name']}} <small><a title="Copy this - direct link to this item on this page" alt="Copy this - direct link to this item on this page" href="#{{thing['_source']['name']}}">#</a></small></h3>
 				
 				<table>
 					
@@ -75,37 +75,9 @@
 				
 			</div>
 		{% endfor %}
-<!--
-        <table>
-        {% for item in answer %}
-            <tr><td>
-            <h3>{{item['name']}}</h3>
-            <p>{{item['description']}}</p>
-            </td>
-            <td class="span6">
-            {% if item['url_prefix'] %}
-                <p>Find it here: <a href="{{item['url_prefix']}}{{string}}{{item['url_suffix']}}">{{item['url_prefix']}}{{string}}{{item['url_suffix']}}</a></p>
-            {% endif %}
-            {% if item['useful_links'][0] %}
-                <p>Learn more</p>
-                <ul>
-                {% for link in item['useful_links'] %}
-                    <li><a href="{{link}}">{{link}}</a></li>
-                {% endfor %}
-                </ul>
-            {% endif %}
-            </td>
-            </tr>
-        {% endfor %}
-        </table>
-        
-    {% else %}
-    
-        <h2>We don't know!</h2>
-        
-        <p>Why not <a href="/submit">submit</a> an identifier thing for it?</p>
-    -->
-    {% endif %} 
+	{% else %}
+		<p>We don't have any tests or descriptions! Go on, <a href="/submit">submit one!</a></p>
+    {% endif %}
 
 </div>
 {% endblock %}
