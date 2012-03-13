@@ -3,6 +3,8 @@ from flask import render_template, flash
 from flask.views import View, MethodView
 from flaskext.login import login_user, current_user
 
+import json
+
 import idfind.identifier
 import idfind.dao
 import idfind.iomanager
@@ -146,11 +148,18 @@ def identify(therest=''):
             q = q.rstrip('.json')
             
     if q:
+    
         # check the storage of identifiers, if already there, respond. else find it.
         identifier = idfind.dao.Identifier.query(q=q)
+        # print
+        # print
+        # print json.dumps(identifier, indent=4)
+        # print
+        # print
         if identifier['hits']['total'] != 0:
+
             flash('We already have that one!')
-            return redirect('/identifier/'+q)
+            # return redirect('/identifier/'+q)
 
         ident = idfind.identifier.Identificator()
         answer = ident.identify(q)
