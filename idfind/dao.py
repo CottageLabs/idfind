@@ -7,6 +7,7 @@ import pyes
 from werkzeug import generate_password_hash, check_password_hash
 from flaskext.login import UserMixin
 
+import idfind.identifier
 
 def init_db():
     conn, db = get_conn()
@@ -135,7 +136,39 @@ class Description(DomainObject):
 	
 class Identifier(DomainObject):
     __type__ = 'identifier'
-
+    
+    @classmethod
+    def identify(self, q):
+        # try the cache first
+        chits = self.query(q=q) # cache hits
+        if chits['hits']['total'] != 0:
+            results = []
+            result = {}
+            for hit in chits['hits']['hits']:
+                for (key, value) in hit['_source'].items():
+                    result[key] = value
+                results.append(result)
+            return results
+            
+        # try identification using the tests in the index
+        engine = idfind.identifier.Identificator()
+        answer = engine.identify(q)
+        if answer:
+            # save the identifier with its type
+            # TODO: and add to the success rate of the test
+            result = answer[0]
+            #obj = idfind.dao.Test.get(answer[0]['id'])
+            #obj['matches'] = obj.get('matches',0) + 1
+            #obj.save()
+            result['identifier'] = q
+            idfind.dao.Identifier.upsert(result)
+            
+        # neither cache search, nor regex identification succeeded    
+        else:
+            idfind.dao.UIdentifier.upsert({"identifier":q, "id":q}) # prevent duplicates in the unknowns
+        
+        return answer
+    
 class UIdentifier(DomainObject):
     __type__ = 'uidentifier'
 

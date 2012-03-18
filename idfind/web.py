@@ -148,35 +148,12 @@ def identify(therest=''):
             q = q.rstrip('.json')
             
     if q:
-    
-        # check the storage of identifiers, if already there, respond. else find it.
-        identifier = idfind.dao.Identifier.query(q=q)
-        # print
-        # print
-        # print json.dumps(identifier, indent=4)
-        # print
-        # print
-        if identifier['hits']['total'] != 0:
-
-            flash('We already have that one!')
-            # return redirect('/identifier/'+q)
-
-        ident = idfind.identifier.Identificator()
-        answer = ident.identify(q)
-        if answer:
-            # save the identifier with its type, and add to the success rate of the test
-            result = answer[0]
-            #obj = idfind.dao.Test.get(answer[0]['id'])
-            #obj['matches'] = obj.get('matches',0) + 1
-            #obj.save()
-            result['identifier'] = q
-            idfind.dao.Identifier.upsert(result)
-        else:
-            idfind.dao.UIdentifier.upsert({"identifier":q, "id":q}) # prevent duplicates in the unknowns
+        identifier = idfind.dao.Identifier.identify(q=q)
+        
         if JSON:
-            return outputJSON(results=answer)
+            return outputJSON(results=identifier)
         else:
-            return render_template('answer.html',answer=answer,string=q)
+            return render_template('answer.html',answer=identifier, string=q)
     
     return render_template('identify.html')
 
