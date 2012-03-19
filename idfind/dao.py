@@ -165,7 +165,7 @@ class Identifier(DomainObject):
             
         # neither cache search, nor regex identification succeeded    
         else:
-            idfind.dao.UIdentifier.upsert({"identifier":q, "id":q}) # prevent duplicates in the unknowns
+            idfind.dao.UIdentifier.upsert({'identifier':q})
         
         return answer
     

@@ -134,7 +134,7 @@ class TweetListen(object):
                             continue
                             
                         else:
-                            idfind.dao.UIdentifier.upsert({"identifier":q, "id":q}) # prevent duplicates in the unknowns
+                            idfind.dao.UIdentifier.upsert({"identifier":q})
                             
                             tweetreply += 'Unknown identifier.'
                             self.save_lastid(status.id) # create/replace the ES document containing the last-processed tweet id
