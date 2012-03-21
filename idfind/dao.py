@@ -139,6 +139,14 @@ class Identifier(DomainObject):
     
     @classmethod
     def identify(self, q):
+        '''Tries to identify an identifier. Returns a list of dictionaries, each item in the list being an answer (a match for q). Returns None if there's no match.
+        
+        Works as follows: 1. try cache; 2. try tests in the index; 3. it's an unknown one.
+        
+        :param q: string to try to identify
+        
+        TODO: instructions on where to look for the format of the answer dictionaries.
+        '''
         # try the cache first
         chits = self.query(q=q) # cache hits
         if chits['hits']['total'] != 0:

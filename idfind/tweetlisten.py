@@ -14,7 +14,7 @@ from idfind.config import config
 class TweetListen(object):
     api = None
     homeurl = config['TWEETLISTEN_BASE_URL']
-    check_for = '@' + config['twitter_account'] + ' (.+)'
+    check_for = None # string to be used as regex later: @account_name, where the twitter username is whatever our twitter account is called
     
     def __init__(self):
         credentials = idfind.dao.TwitterCreds.query(q='*')
@@ -26,6 +26,15 @@ class TweetListen(object):
             access_token_key = credentials['hits']['hits'][0]['_source']['access_token_key'],
             access_token_secret = credentials['hits']['hits'][0]['_source']['access_token_secret']
             )
+            
+            user = self.api.VerifyCredentials()
+            
+            if user:
+                name = user.GetScreenName()
+                self.check_for = '@' + name + ' (.+)'
+            else:
+                raise Exception('Oops, invalid twitter credentials!')
+                
         else:
             raise Exception('Oops, you need to index the twitter credentials into elasticsearch first!')
 
@@ -73,86 +82,43 @@ class TweetListen(object):
                         
                         # print q # debug
                         
-                        tweetreply = '@' + status.user.screen_name + ' ' # can't construct the whole string and then PostUpdate() it to Twitter at the end of the processing loop - that loop uses 'continue' in order to prevent further processing when one of the cases is hit... 
-                        # yeah, it's ugly, the original code in idfind.web.identify uses an HTTP redirect and thus stops further execution, but we can't do that here, hence the continue
-                    
-                        # check the storage of identifiers, if already there, respond. else find it.
-                        identifier = idfind.dao.Identifier.query(q=q)
-                        if identifier['hits']['total'] != 0:
-                            
-                            identifier_record = identifier['hits']['hits'][0]['_source']
-                            
-                            url_prefix = None
-                            url_suffix = None
-                            if 'url_prefix' in identifier_record:
-                                url_prefix = identifier_record['url_prefix']
-                            if 'url_suffix' in identifier_record:
-                                url_suffix = identifier_record['url_suffix']
-                            
-                            if url_prefix:
-                                tweetreply += url_prefix
-                                tweetreply += q
-                                # We can't have a URL Suffix ONLY, can we?
-                                if url_suffix:
-                                    tweetreply += url_suffix
-                                tweetreply += '; '
-                            
-                            tweetreply += 'info @ ' + self.homeurl + '/identifier/' + q
-                            self.save_lastid(status.id) # create/replace the ES document containing the last-processed tweet id
-                            self.api.PostUpdate(tweetreply, in_reply_to_status_id = status.id)
-                            
-                            
-                            print 'Got it! From the storage :: ' + str(status.id) + ' "' + status.text + '"'
-                            continue
-
-                        ident = idfind.identifier.Identificator()
-                        answer = ident.identify(q)
+                        tweetreply = '@' + status.user.screen_name + ' '
+                        
+                        answer = idfind.dao.Identifier.identify(q=q)
+                        
                         if answer:
-                            # save the identifier with its type, and add to the success rate of the test
+                        # we've got this identifier
                             result = answer[0]
-                            #obj = idfind.dao.Test.get(answer[0]['id'])
-                            #obj['matches'] = obj.get('matches',0) + 1
-                            #obj.save()
-                            result['identifier'] = q
-                            idfind.dao.Identifier.upsert(result)
                             
                             if result['url_prefix']:
                                 tweetreply += result['url_prefix']
                                 tweetreply += q
-                                # We can't have a URL Suffix ONLY, can we?
+                                # We can't have a URL Suffix WITHOUT a URL Prefix, can we?
                                 if result['url_suffix']:
                                     tweetreply += result['url_suffix']
                                 tweetreply += '; '
                                 
-                            tweetreply += 'info @ ' + self.homeurl + '/identifier/' + q
+                            tweetreply += 'info @ ' + self.homeurl + '/identify/' + q
                             
-                            self.save_lastid(status.id) # create/replace the ES document containing the last-processed tweet id
-                            self.api.PostUpdate(tweetreply, in_reply_to_status_id = status.id)
-                            
-                            
-                            print 'Got it! Engine ident :: ' + str(status.id) + ' "' + status.text + '"'
-                            continue
-                            
+                            debug_prefix = 'Got it'
                         else:
-                            idfind.dao.UIdentifier.upsert({"identifier":q})
-                            
+                        # unknown identifier
                             tweetreply += 'Unknown identifier.'
-                            self.save_lastid(status.id) # create/replace the ES document containing the last-processed tweet id
-                            self.api.PostUpdate(tweetreply, in_reply_to_status_id = status.id)
+                            debug_prefix = 'Unknown identifier'
                             
+                        print debug_prefix + ' ::: Tweet ID: ' + str(status.id) + ', Text: "' + status.text + '"' + ', Asker: ' + status.GetUser().GetScreenName()
                             
-                            print 'Unknown identifier :: ' + str(status.id) + ' "' + status.text + '"'
-                            continue
-                            
+                        self.save_lastid(status.id) # create/replace the ES document containing the last-processed tweet id
+                        self.api.PostUpdate(tweetreply, in_reply_to_status_id = status.id)
+                      
                     else:
-                        print str(status.id) + ' ' + status.text + 'This tweet doesn\'t match the format (regex): ' + self.check_for
+                        print str(status.id) + ' ' + status.text + 'This tweet doesn\'t match the regex with the project\'s username: ' + self.check_for
                     
 
                 except twitter.TwitterError as error:
                     print 'Twitter error while processing tweet (id = ' + str(status.id) + ' ); Error was: ' + error.args[0]
-                    print
                     
             sleep(61) # sleep a minute - make sure we are not getting cached responses from the python-twitter library
-
+        
 x = TweetListen()
 x.listen()
