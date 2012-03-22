@@ -25,6 +25,12 @@ class Identificator(object):
             match = self._check_expression(identifier, r)
             if match is None:
                 continue
+            
+            # r is going to become the identifier document in the index - which was created / modified at the time of identification (now)
+            # not at the time when the *test* which succeeded was created/modified
+            r['created'] = datetime.now().isoformat()
+            r['modified'] = datetime.now().isoformat()
+            
             if not r['url_prefix']:
                 success.append(r)
                 continue

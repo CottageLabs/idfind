@@ -44,6 +44,10 @@ def standard_authentication():
                 login_user(user, remember=False)
 
 
+@app.template_filter('dtformat')
+def datetimeformat(value, format='%d-%B-%Y %H:%M:%S'):
+    return value.strftime(format)
+                
 @app.route('/')
 def home():
     return render_template('home/index.html')

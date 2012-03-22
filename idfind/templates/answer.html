@@ -5,32 +5,84 @@
     <h1>{{string}}</h1>
 
     {% if answer %}
-
-        <h1>{{answer[0]['name']}}</h1>
         
         <p>Here are the successful matches on this identifier, and some useful info:</p>
 
         <table>
         {% for item in answer %}
-            <tr><td>
-            <h3>{{item['name']}}</h3>
-            <p>{{item['description']}}</p>
-            </td>
-            <td class="span6">
-            {% if item['url_prefix'] %}
-                <p>Find it here: <a href="{{item['url_prefix']}}{{string}}{{item['url_suffix']}}">{{item['url_prefix']}}{{string}}{{item['url_suffix']}}</a></p>
-            {% endif %}
-            {% if item['useful_links'][0] %}
-                <p>Learn more</p>
-                <ul>
-                {% for link in item['useful_links'] %}
-                    <li><a href="{{link}}">{{link}}</a></li>
-                {% endfor %}
-                </ul>
-            {% endif %}
-				 <p>Identified by test named <a href="/browse#{{item['name']}}">{{item['name']}}</a></p>
-            </td>
-            </tr>
+			<tr>
+				<td width="15%"><h3>What it is</h3></td>
+				
+				<td>
+					<h3>{{item['name']}}</h3>
+					{% if item['description'] %}<p>{{item['description']}}</p>{% endif %}
+				</td>
+			</tr>
+			
+			{% if item['url_prefix'] %}
+			<tr>
+				<td>Find it here</td>
+				<td>
+					<a href="{{item['url_prefix']}}{{string}}{{item['url_suffix']}}">
+					{{item['url_prefix']}}{{string}}{{item['url_suffix']}}</a>
+				</td>
+			</tr>
+			{% endif %}
+				
+			{% if item['useful_links'][0] %}
+			<tr>
+				<td>Learn more</td>
+				<td>
+					<ul>
+					{% for link in item['useful_links'] %}
+						<li><a href="{{link}}">{{link}}</a></li>
+					{% endfor %}
+					</ul>
+				</td>
+			</tr>
+			{% endif %}
+			
+			{% if item['tags'][0] %}
+			<tr>
+				<td>Tags</td>
+				<td>
+				{{ item['tags']|join(', ') }}
+				</td>
+			</tr>
+			{% endif %}
+			
+			<tr>
+				<td>Test used</td>
+				<td><a href="/browse#{{item['name']}}">{{item['name']}}</a></td>
+			</tr>
+			
+			<tr>
+				<td>Regular expression</td>
+				<td>{{item['regex']}}</td>
+			</tr>
+			
+			{% if item['resptest'] %}
+			<tr>
+				<td>Response condition</td>
+				<td>{{item['resptest_type']}} {{item['resptest_cond']}} {{item['resptest']}}</td>
+			</tr>
+			{% endif %}
+			
+			<tr>
+				<td>Test submitted by</td>
+				<td>{{item['owner']}}</td>
+			</tr>
+			
+			<tr>
+				<td>Identified on</td>
+				<td>{{item['created'] | dtformat}}</td>
+			</tr>
+			
+			<tr>
+				<td>Last modified</td>
+				<td>{{item['modified'] | dtformat}}</td>
+			</tr>
+			
         {% endfor %}
         </table>
         

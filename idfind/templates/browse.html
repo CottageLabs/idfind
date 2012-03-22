@@ -38,39 +38,83 @@
 				<table>
 					
 					<!-- sets the visuals of the table and so is always displayed, even if description is empty -->
-					<tr><td width="15%">Description</td><td>{{thing['_source']['description']}}</td></tr>
+					<tr>
+						<td width="15%">Description</td>
+						<td>{{thing['_source']['description']}}</td>
+					</tr>
 					
-					{% if thing['_source']['regex'] %}<tr><td>Regular expression</td><td>{{thing['_source']['regex']}}</td></tr>{% endif %}
+					{% if thing['_source']['regex'] %}
+					<tr>
+						<td>Regular expression</td>
+						<td>{{thing['_source']['regex']}}</td>
+					</tr>
+					{% endif %}
 					
-					{% if thing['_source']['url_prefix'] %}<tr><td>Service URL prefix</td><td>{{thing['_source']['url_prefix']}}</td></tr>{% endif %}
+					{% if thing['_source']['url_prefix'] %}
+					<tr>
+						<td>Service URL prefix</td>
+						<td>{{thing['_source']['url_prefix']}}</td>
+					</tr>
+					{% endif %}
 					
-					{% if thing['_source']['url_suffix'] %}<tr><td>Service URL suffix</td><td>{{thing['_source']['url_suffix']}}</td></tr>{% endif %}
+					{% if thing['_source']['url_suffix'] %}
+					<tr>
+						<td>Service URL suffix</td>
+						<td>{{thing['_source']['url_suffix']}}</td>
+					</tr>
+					{% endif %}
 					
-					{% if thing['_source']['resptest'] %}<tr><td>Response condition</td><td>{{thing['_source']['resptest_type']}} {{thing['_source']['resptest_cond']}} {{thing['_source']['resptest']}}</td></tr>{% endif %}
+					{% if thing['_source']['resptest'] %}
+					<tr>
+						<td>Response condition</td>
+						<td>{{thing['_source']['resptest_type']}} {{thing['_source']['resptest_cond']}} {{thing['_source']['resptest']}}</td>
+					</tr>
+					{% endif %}
 					
 					{% if thing['_source']['useful_links'][0] %}
-						<tr>
-							<td>Learn more</td>
-							<td>
-							<ul>
-							{% for link in thing['_source']['useful_links'] %}
-								<li><a href="{{link}}">{{link}}</a></li>
-							{% endfor %}
-							</ul>
-							</td>
-						</tr>
+					<tr>
+						<td>Learn more</td>
+						<td>
+						<ul>
+						{% for link in thing['_source']['useful_links'] %}
+							<li><a href="{{link}}">{{link}}</a></li>
+						{% endfor %}
+						</ul>
+						</td>
+					</tr>
 					{% endif %}
 					
 					{% if thing['_source']['tags'][0] %}
-						<tr>
-							<td>Tags</td>
-							<td>
-							{{ thing['_source']['tags']|join(', ') }}
-							</td>
-						</tr>
+					<tr>
+						<td>Tags</td>
+						<td>
+						{{ thing['_source']['tags']|join(', ') }}
+						</td>
+					</tr>
 					{% endif %}
 					
-					{% if thing['_source']['owner'] %}<tr><td>Submitted by</td><td>{{thing['_source']['owner']}}</td></tr>{% endif %}
+					<tr>
+						<td>Submitted by</td>
+						<td>{{thing['_source']['owner']}}</td>
+					</tr>
+					
+					<tr>
+						<td>Created on</td>
+						{#
+						{{thing['_source']['created'] | dtformat}} - doesn't work, 'created' and 'modified' seem to be unicode strings and the filter defined in web.py errors out with
+						
+						AttributeError: 'unicode' object has no attribute 'strftime'
+						
+						So these strings are unformatted for now, displayed as they were in the ES index.
+						#}
+						<td>{{thing['_source']['created']}}</td>
+					</tr>
+					
+					<tr>
+						<td>Last modified</td>
+						<td>{{thing['_source']['modified']}}</td>
+					</tr>
+					
 				</table>
 				
 			</div>
