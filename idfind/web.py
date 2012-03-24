@@ -189,7 +189,14 @@ class RateView(MethodView):
             return redirect('/account/login')
         if request.values.get("type") is not None:
             return self.post()
-        return render_template('rate.html')
+            
+        tests = idfind.dao.Test.query() # get all the tests
+        tests = tests['hits']['hits']
+        
+        descs = idfind.dao.Description.query() # get all the descriptions
+        descs = descs['hits']['hits']
+
+        return render_template('rate.html', possibles=tests+descs, methods=tests)
 
     def post(self):
         if not auth.collection.create(current_user, None):

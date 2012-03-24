@@ -20,7 +20,7 @@ class Importer(object):
                 pre = 'http://' + pre
         
         resptest = request.values.get("resptest",'')
-        if resptest != '':
+        if resptest:
             resptest_type = request.values.get("resptest_type",'')
             resptest_cond = request.values.get("resptest_cond",'')
         else:
@@ -51,3 +51,5 @@ class Importer(object):
         if request.values["test_or_desc"] == "description":
             idfind.dao.Description.upsert(record)
         
+    def rate(self, request):
+        pass
