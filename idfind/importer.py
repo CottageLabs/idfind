@@ -40,7 +40,13 @@ class Importer(object):
             "description": request.values.get("description",''),
             # TODO: refactor useful links handling below (and perhaps submit.html template) to allow for multiple useful links
             "useful_links": useful_links,
-            "tags": [final_tag for final_tag in [tag.strip() for tag in request.values.get("tags",'').split(",")] if final_tag], # return no empty strings as tags, trim whitespace on both ends of individual tags; but only check for empty strings AFTER splitting and trimming the individual strings - prevents things like "tag1, tag2, " from inserting an empty tag at the end: don't want ["tag1", "tag2", ""]
+            
+            # for tags - return no empty strings as tags, trim whitespace on 
+            # both ends of individual tags; but only check for empty strings
+            # AFTER splitting and trimming the individual strings - prevents
+            # things like "tag1, tag2, " from inserting an empty tag at the
+            # end: e.g. don't want ["tag1", "tag2", ""]
+            "tags": [final_tag for final_tag in [tag.strip() for tag in request.values.get("tags",'').split(",")] if final_tag], 
             "created": datetime.now().isoformat(),
             "modified": datetime.now().isoformat(),
             "owner": self.owner.id
