@@ -40,7 +40,7 @@ class Importer(object):
             "description": request.values.get("description",''),
             # TODO: refactor useful links handling below (and perhaps submit.html template) to allow for multiple useful links
             "useful_links": useful_links,
-            "tags": request.values.get("tags",'').split(","),
+            "tags": [final_tag for final_tag in [tag.strip() for tag in request.values.get("tags",'').split(",")] if final_tag], # return no empty strings as tags, trim whitespace on both ends of individual tags; but only check for empty strings AFTER splitting and trimming the individual strings - prevents things like "tag1, tag2, " from inserting an empty tag at the end: don't want ["tag1", "tag2", ""]
             "created": datetime.now().isoformat(),
             "modified": datetime.now().isoformat(),
             "owner": self.owner.id
@@ -50,6 +50,6 @@ class Importer(object):
             idfind.dao.Test.upsert(record)
         if request.values["test_or_desc"] == "description":
             idfind.dao.Description.upsert(record)
-        
+	
     def rate(self, request):
         pass
