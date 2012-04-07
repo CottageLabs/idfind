@@ -36,7 +36,20 @@ jQuery(document).ready(function() {
     }
     jQuery('#collection').bind('keyup',checkcoll);
 
-    
+    // functionality of "add more" buttons across the whole site
+	
+	// add more tags - expand the text input field with the tags
+	// #tags is the input text field holding the user's tags
+	// #more_tags is the "add more" button next to the input text field
+	$('#more_tags').click( function () {
+		var curwidth = $('#tags').width();
+		/* Another 100 pixels should be good on most devices and the user
+		 * shouldn't even have to click the "add more" button again, but
+		 * they can if they want to - so 100 should be a good increment. */
+		$('#tags').width(curwidth + 100);
+		return false;
+	});
+	
 });
 
 
