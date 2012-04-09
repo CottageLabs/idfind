@@ -222,10 +222,14 @@ class SubmitView(MethodView):
             abort(401)
         # TODO: need some better validation. see python flask docs for info.
         if 'test_or_desc' in request.values:
-            importer = idfind.importer.Importer(owner=current_user)
-            importer.submit(request)
-            flash('Successfully received %s' % request.values.get("test_or_desc"))
-            return redirect('/')
+            if request.values['name']:
+                importer = idfind.importer.Importer(owner=current_user)
+                importer.submit(request)
+                flash('Successfully received %s' % request.values["test_or_desc"])
+                return redirect('/browse#' + request.values['name'])
+            else:
+                flash('We need a name for your test / description')
+                return render_template('submit.html')
         else:
             flash('You did not tell us if you are submitting a test or a description')
             return render_template('submit.html')

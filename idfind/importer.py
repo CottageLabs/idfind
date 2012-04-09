@@ -30,7 +30,7 @@ class Importer(object):
         useful_links = [request.values.get("useful_link1",'')]
             
         record = {
-            "name": request.values.get("name",''),
+            "name": request.values['name'], # guaranteed to have 'name'
             "regex": request.values.get("regex",''),
             "url_prefix": pre,
             "url_suffix": request.values.get("url_suffix",''),
@@ -51,9 +51,11 @@ class Importer(object):
             "modified": datetime.now().isoformat(),
             "owner": self.owner.id,
             "ratings": [],
-            "score_feedback": 0
+            "score_feedback": 0,
+            "votes_feedback": 0
         }
         
+        # guaranteed to have 'test_or_desc'
         if request.values["test_or_desc"] == "test":
             idfind.dao.Test.upsert(record)
         if request.values["test_or_desc"] == "description":
@@ -88,14 +90,20 @@ class Importer(object):
         # and the value of that is a list of all received ratings, each of
         # which is in itself a dictionary
         
-        # also modify the test's feedback-generated accuracy score
-        if 'score_feedback' not in test:
+        # also modify the test's feedback-generated accuracy score and
+        # increment total votes counter
+        
         # preserve backwards compatibility so users don't have to delete their
         # ES indexes just because we've added an item to the "test" type
+        if 'score_feedback' not in test:
             test['score_feedback'] = 0
+        if 'votes_feedback' not in test:
+            test['votes_feedback'] = 0
             
         if test_worked:
             test['score_feedback'] += 1
         else:
             test['score_feedback'] -= 1 # yes, it can go negative!
+        
+        test['votes_feedback'] += 1
         test.save()
