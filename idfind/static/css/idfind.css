@@ -32,6 +32,7 @@ input.frontin {
     border:1px solid #f5f5f5;
     background-color:#f5f5f5;
 }
+
 input.frontin:hover{
     background-color:white;
     border:1px solid #373737;

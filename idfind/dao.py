@@ -2,6 +2,7 @@ import json
 import uuid
 import UserDict
 import httplib
+from datetime import datetime
 
 import pyes
 from werkzeug import generate_password_hash, check_password_hash
@@ -41,6 +42,8 @@ class DomainObject(UserDict.IterableUserDict):
     def save(self):
         '''Save to backend storage.'''
         # TODO: refresh object with result of save
+        if 'modified' in self.data:
+            self.data['modified'] = datetime.now().isoformat()
         return self.upsert(self.data)
 
     @classmethod
@@ -49,7 +52,6 @@ class DomainObject(UserDict.IterableUserDict):
         conn, db = get_conn()
         try:
             out = conn.get(db, cls.__type__, id_)
-            print out['_source']
             return cls(**out['_source'])
         except pyes.exceptions.ElasticSearchException, inst:
             if inst.status == 404:

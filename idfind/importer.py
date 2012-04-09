@@ -49,7 +49,9 @@ class Importer(object):
             "tags": [final_tag for final_tag in [tag.strip() for tag in request.values.get("tags",'').split(",")] if final_tag], 
             "created": datetime.now().isoformat(),
             "modified": datetime.now().isoformat(),
-            "owner": self.owner.id
+            "owner": self.owner.id,
+            "ratings": [],
+            "score_feedback": 0
         }
         
         if request.values["test_or_desc"] == "test":
@@ -58,4 +60,42 @@ class Importer(object):
             idfind.dao.Description.upsert(record)
 	
     def rate(self, request):
-        pass
+        # construct a dictionary containing all the feedback information the
+        # user gave us and some additional bits
+        rating = {}
+        rating['owner'] = self.owner.id
+        rating['comment'] = request.values.get("comment", '')
+        if request.values['test_worked'] == 'Yes':
+            test_worked = True
+        elif request.values['test_worked'] == 'No':
+            test_worked = False    
+        rating['test_worked'] = test_worked
+        rating['identifier'] = request.values.get("identifier_string", '')
+        rating['created'] = datetime.now().isoformat()
+        rating['modified'] = datetime.now().isoformat()
+        
+        # The below will crash and burn if there is test_id in the request we
+        # got, and so it should - we can't know which test to rate without its
+        # unique id in the index.
+        test = idfind.dao.Test.get(request.values['test_id'])
+        
+        if 'ratings' not in test:
+            test['ratings'] = []
+        
+        # append the rating dict to the other ratings received for this test
+        test['ratings'].append(rating)
+        # so you end up with a key "ratings" in the test's "_source" dictionary
+        # and the value of that is a list of all received ratings, each of
+        # which is in itself a dictionary
+        
+        # also modify the test's feedback-generated accuracy score
+        if 'score_feedback' not in test:
+        # preserve backwards compatibility so users don't have to delete their
+        # ES indexes just because we've added an item to the "test" type
+            test['score_feedback'] = 0
+            
+        if test_worked:
+            test['score_feedback'] += 1
+        else:
+            test['score_feedback'] -= 1 # yes, it can go negative!
+        test.save()

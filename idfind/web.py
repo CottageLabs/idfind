@@ -46,7 +46,7 @@ def standard_authentication():
 
 @app.template_filter('dtformat')
 def datetimeformat(value, format='%d-%B-%Y %H:%M:%S'):
-    return value.strftime(format)
+    return value#.strftime(format)
                 
 @app.route('/')
 def home():
@@ -157,7 +157,9 @@ def identify(therest=''):
         if JSON:
             return outputJSON(results=identifier)
         else:
-            return render_template('answer.html',answer=identifier, string=q)
+            test_used = idfind.dao.Test.query(q=identifier[0]['name'])
+            test_used = test_used['hits']['hits']
+            return render_template('answer.html',answer=identifier, identifier_string=q, tests=test_used)
     
     return render_template('identify.html')
 
@@ -180,23 +182,17 @@ def parse():
 
 
 class RateView(MethodView):
-    # regex=ID of regex in system
-    # score=8
-    # e.g. a subjective assessment of the quality of the regex.
     def get(self):
         if not auth.collection.create(current_user, None):
             flash('You need to login to rate a regex')
             return redirect('/account/login')
-        if request.values.get("type") is not None:
+        if request.values.get("test_worked") is not None:
             return self.post()
             
         tests = idfind.dao.Test.query() # get all the tests
         tests = tests['hits']['hits']
-        
-        descs = idfind.dao.Description.query() # get all the descriptions
-        descs = descs['hits']['hits']
 
-        return render_template('rate.html', possibles=tests+descs, methods=tests)
+        return render_template('rate.html', tests=tests)
 
     def post(self):
         if not auth.collection.create(current_user, None):
@@ -204,7 +200,7 @@ class RateView(MethodView):
         importer = idfind.importer.Importer(owner=current_user)
         importer.rate(request)
         flash('Successfully received your rating')
-        return redirect('/account/%s/' % current_user.id)
+        return redirect('/')
 
 app.add_url_rule('/rate', view_func=RateView.as_view('rate'))
 

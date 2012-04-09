@@ -1,0 +1,63 @@
+<h2>Rate</h2>
+
+<p>Tell us if the identifier test that was used worked for you to let us know its accuracy; future requests for that type of identifier will use the highest scoring test available.</p>
+		
+<div class="action_box">
+    <form action="/rate" method="POST" enctype="multipart/form-data">
+    <fieldset>
+        <div class="clearfix">
+        <label for="tests">Which identifier test do you want to rate?</label>
+        
+		{% if tests %}
+			<div class="input">
+			{# If there more than 1 test was passed to the template, render a
+				drop-down menu for the user to pick which test they want to
+				rate. #}
+			{% if tests[1] %}
+				<select name="test_id">
+				{% for t in tests %}
+					<option value="{{t['_id']}}">{{t['_source']['name']}}</option>
+				{% endfor %}
+				</select>
+				<span class="help-block">
+				e.g. a DOI.
+				</span>
+			{% else %}
+				<h3>{{tests[0]['_source']['name']}}</h3>
+				<input type="hidden" name="test_id" value="{{tests[0]['_id']}}"/>
+				{% if identifier_string %}
+					<input type="hidden" name="identifier_string" value="{{identifier_string}}"/>
+				{% endif %}
+			{% endif %}
+			</div>
+		{% else %}
+			<p>Sorry, the system doesn't know any tests for identifiers yet! Why not <a href="/submit">teach it</a>?</p>
+		{% endif %} 
+		</div>
+		
+		<div class="clearfix">
+        <label for="comment">Comment on the test</label>
+        <div class="input">
+        <textarea class="span6" name="comment"></textarea>
+        <span class="help-block">
+        Anything to point out? (Optional)
+        </span>
+        </div>
+        </div>
+		
+        <div class="controls clearfix">
+        <label>Was the test accurate?</label>
+        <div class="input">
+			<input id="test_uprate" class="btn success span3" type="submit" name="test_worked" value="Yes"/>
+			<input id="test_downrate" class="btn danger span3" type="submit" name="test_worked" value="No"/>
+        <span class="help-block">
+        Clicking either option will submit all your feedback. Thank you!
+        </span>
+		</div>
+        </div>
+		
+		
+    </fieldset>
+    </form>
+</div>
+

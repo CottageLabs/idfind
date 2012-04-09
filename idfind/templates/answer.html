@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="action_box">
-    <h1>{{string}}</h1>
+    <h1>{{identifier_string}}</h1>
 
     {% if answer %}
         
@@ -23,8 +23,8 @@
 			<tr>
 				<td>Find it here</td>
 				<td>
-					<a href="{{item['url_prefix']}}{{string}}{{item['url_suffix']}}">
-					{{item['url_prefix']}}{{string}}{{item['url_suffix']}}</a>
+					<a href="{{item['url_prefix']}}{{identifier_string}}{{item['url_suffix']}}">
+					{{item['url_prefix']}}{{identifier_string}}{{item['url_suffix']}}</a>
 				</td>
 			</tr>
 			{% endif %}
@@ -85,7 +85,9 @@
 			
         {% endfor %}
         </table>
-        
+	
+	{% include "_rate_test.html" %}
+	
     {% else %}
     
         <h2>We don't know!</h2>
