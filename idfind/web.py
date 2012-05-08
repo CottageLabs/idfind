@@ -152,14 +152,26 @@ def identify(therest=''):
             q = q.rstrip('.json')
             
     if q:
-        identifier = idfind.dao.Identifier.identify(q=q)
+        answers = idfind.dao.Identifier.identify(q=q)
         
         if JSON:
-            return outputJSON(results=identifier)
+            return outputJSON(results=answers)
         else:
-            test_used = idfind.dao.Test.query(q=identifier[0]['name'])
-            test_used = test_used['hits']['hits']
-            return render_template('answer.html',answer=identifier, identifier_string=q, tests=test_used)
+            tests_used = []
+            for a in answers:
+                # TODO: perhaps build up a query to get all the successful
+                # tests instead of getting them one by one, separate queries
+                t = idfind.dao.Test.query(q=a['name'])
+                if t['hits']['total'] != 0:
+                    t = t['hits']['hits']
+                    for hit in t:
+                    # TODO: ask elasticsearch for an exact match on the test
+                    # name in the query line above - the below is really dumb!
+                    # Or, of course, just implement the TODO above, get rid of this completely...
+                        if hit['_source']['name'] == a['name']:
+                            tests_used.append(hit)
+             
+            return render_template('answer.html',answer=answers, identifier_string=q, tests=tests_used)
     
     return render_template('identify.html')
 
@@ -167,6 +179,7 @@ def identify(therest=''):
     
 @app.route('/browse', methods=['GET'])
 def browse():
+    # tests = idfind.dao.Test.query(sort=[{"name":"asc"}]) # get all the tests # ES query with sorting fails for tests which have spaces in their names
     tests = idfind.dao.Test.query() # get all the tests
     tests = tests['hits']['hits']
     

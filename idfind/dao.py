@@ -69,6 +69,11 @@ class DomainObject(UserDict.IterableUserDict):
         else:
             id_ = uuid.uuid4().hex
             data['id'] = id_
+            
+        if 'created' not in data and 'modified' not in data:
+            data['created'] = datetime.now().isoformat()
+            data['modified'] = datetime.now().isoformat()
+            
         conn.index(data, db, cls.__type__, id_)
         return cls(**data)
 
@@ -152,6 +157,20 @@ class Identifier(DomainObject):
         # try the cache first
         chits = self.query(q=q) # cache hits
         if chits['hits']['total'] != 0:
+
+        # if we do get any hits, unpack everything in _source to be accessible
+        # directly 1 level up - not very elegant at all, but all the code which
+        # uses the results of this method expects to be able to say
+        # for identifier in this_methods_results:
+        #     print identifier['name'] # NOT identifier['_source']['name']
+        # and the reason THAT code was written that way is because of the
+        # unpacking of _source which goes on in identifier.py (look for:
+        # r = r['_source']
+        # ). So maybe that line needs to go, and then all the code everywhere
+        # should be converted to use ['_source']['attribute'], and then we
+        # won't have to do stupid unpacking here. Until then, though :)...
+        
+        # perhaps we just need to do **out['_source'] instead of this .. "code"
             results = []
             result = {}
             for hit in chits['hits']['hits']:
@@ -165,11 +184,7 @@ class Identifier(DomainObject):
         answer = engine.identify(q)
         if answer:
             # save the identifier with its type
-            # TODO: and add to the success rate of the test
-            result = answer[0]
-            #obj = idfind.dao.Test.get(answer[0]['id'])
-            #obj['matches'] = obj.get('matches',0) + 1
-            #obj.save()
+            result = answer[0] # TODO multiple successful tests handling
             result['identifier'] = q
             idfind.dao.Identifier.upsert(result)
             

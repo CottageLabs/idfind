@@ -39,7 +39,7 @@
 					
 					<!-- sets the visuals of the table and so is always displayed, even if description is empty -->
 					<tr>
-						<td width="15%">Description</td>
+						<td width="20%">Description</td>
 						<td>{{thing['_source']['description']}}</td>
 					</tr>
 					
@@ -61,6 +61,13 @@
 					<tr>
 						<td>Number of raters</td>
 						<td>{{thing['_source']['votes_feedback']}}</td>
+					</tr>
+					{% endif %}
+					
+					{% if thing['_source']['auto_succeeded'] %}
+					<tr>
+						<td>Identification successes (automatic)</td>
+						<td>{{thing['_source']['auto_succeeded']}}</td>
 					</tr>
 					{% endif %}
 					

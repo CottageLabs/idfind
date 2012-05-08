@@ -27,6 +27,11 @@ class Importer(object):
             resptest_type = ''
             resptest_cond = ''
         
+        # TODO - multiple useful links handling
+        # Basically, needs to be a variant of multiple tag handling (below)
+        # although in this case the links will be coming from multiple fields,
+        # not a single field. In any case, if the user didn't specify any links
+        # we need to end up with an empty list []. Otherwise, a list of URL-s.
         useful_links = [request.values.get("useful_link1",'')]
             
         record = {
@@ -52,7 +57,8 @@ class Importer(object):
             "owner": self.owner.id,
             "ratings": [],
             "score_feedback": 0,
-            "votes_feedback": 0
+            "votes_feedback": 0,
+            "auto_succeeded": 0
         }
         
         # guaranteed to have 'test_or_desc'
@@ -70,40 +76,31 @@ class Importer(object):
         if request.values['test_worked'] == 'Yes':
             test_worked = True
         elif request.values['test_worked'] == 'No':
-            test_worked = False    
+            test_worked = False
         rating['test_worked'] = test_worked
         rating['identifier'] = request.values.get("identifier_string", '')
         rating['created'] = datetime.now().isoformat()
         rating['modified'] = datetime.now().isoformat()
         
-        # The below will crash and burn if there is test_id in the request we
-        # got, and so it should - we can't know which test to rate without its
-        # unique id in the index.
+        # The below will crash and burn if there is no test_id in the request
+        # we got, and so it should - we can't know which test to rate without
+        # its unique id in the index.
         test = idfind.dao.Test.get(request.values['test_id'])
         
-        if 'ratings' not in test:
-            test['ratings'] = []
+        # add the rating for this test
+        test.data.setdefault('ratings',[]) # if there's no 'ratings' key, add it as an empty list
+        test.data['ratings'].append(rating) # add the rating dict to the list of ratings
         
-        # append the rating dict to the other ratings received for this test
-        test['ratings'].append(rating)
-        # so you end up with a key "ratings" in the test's "_source" dictionary
+        # So, we end up with a key "ratings" in the test's "_source" dictionary
         # and the value of that is a list of all received ratings, each of
         # which is in itself a dictionary
         
         # also modify the test's feedback-generated accuracy score and
         # increment total votes counter
-        
-        # preserve backwards compatibility so users don't have to delete their
-        # ES indexes just because we've added an item to the "test" type
-        if 'score_feedback' not in test:
-            test['score_feedback'] = 0
-        if 'votes_feedback' not in test:
-            test['votes_feedback'] = 0
-            
         if test_worked:
-            test['score_feedback'] += 1
+            test['score_feedback'] = test.data.get('score_feedback', 0) + 1
         else:
-            test['score_feedback'] -= 1 # yes, it can go negative!
+            test['score_feedback'] = test.data.get('score_feedback', 0) - 1 # yes, it can go negative!
+        test['votes_feedback'] = test.data.get('votes_feedback', 0) + 1
         
-        test['votes_feedback'] += 1
         test.save()
