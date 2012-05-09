@@ -32,11 +32,12 @@ class Identificator(object):
                 continue
             
             # copy all relevant values from the test object
-            # do not copy user-submitted feedback or automatic statistics
-            dontcopy = ["ratings", "auto_succeeded", "score_feedback", "votes_feedback"]
-            for key, value in r.items():
-                if key not in dontcopy:
-                    i[key] = value
+            i = r;
+            # do not copy user-submitted feedback or automatic statistics + remove unique doc. id
+            dontcopy = ["ratings", "auto_succeeded", "score_feedback", "votes_feedback", "id"]
+            for del_key in dontcopy:
+                if del_key in i:
+                    del i[del_key]
             # set timestamps of identifier object (it's being created *now*)
             i['created'] = datetime.now().isoformat()
             i['modified'] = datetime.now().isoformat()

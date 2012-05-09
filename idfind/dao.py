@@ -184,7 +184,7 @@ class Identifier(DomainObject):
         answer = engine.identify(q)
         if answer:
             # save the identifier with its type
-            result = answer[0] # TODO multiple successful tests handling
+            result['what'] = answer # TODO multiple successful tests handling
             result['identifier'] = q
             idfind.dao.Identifier.upsert(result)
             
