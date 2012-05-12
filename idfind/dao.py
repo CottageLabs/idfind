@@ -157,34 +157,15 @@ class Identifier(DomainObject):
         # try the cache first
         chits = self.query(q=q) # cache hits
         if chits['hits']['total'] != 0:
-
-        # if we do get any hits, unpack everything in _source to be accessible
-        # directly 1 level up - not very elegant at all, but all the code which
-        # uses the results of this method expects to be able to say
-        # for identifier in this_methods_results:
-        #     print identifier['name'] # NOT identifier['_source']['name']
-        # and the reason THAT code was written that way is because of the
-        # unpacking of _source which goes on in identifier.py (look for:
-        # r = r['_source']
-        # ). So maybe that line needs to go, and then all the code everywhere
-        # should be converted to use ['_source']['attribute'], and then we
-        # won't have to do stupid unpacking here. Until then, though :)...
-        
-        # perhaps we just need to do **out['_source'] instead of this .. "code"
-            results = []
-            result = {}
-            for hit in chits['hits']['hits']:
-                for (key, value) in hit['_source'].items():
-                    result[key] = value
-                results.append(result)
-            return results
+            return chits['hits']['hits'][0]['_source']['what']
             
         # try identification using the tests in the index
         engine = idfind.identifier.Identificator()
         answer = engine.identify(q)
         if answer:
             # save the identifier with its type
-            result['what'] = answer # TODO multiple successful tests handling
+            result = {}
+            result['what'] = answer
             result['identifier'] = q
             idfind.dao.Identifier.upsert(result)
             
