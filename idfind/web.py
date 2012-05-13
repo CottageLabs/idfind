@@ -250,6 +250,7 @@ class SubmitView(MethodView):
 app.add_url_rule('/submit', view_func=SubmitView.as_view('submit'))
 
 
+# code from bibserver - need to review what it does and why, and see if it works
 @app.route('/record/<path:path>')
 def record(path):
     JSON = False
@@ -270,7 +271,7 @@ def record(path):
         io = idfind.iomanager.IOManager(res)
         return render_template('record.html', io=io)
 
-
+# code from bibserver - need to review what it does and why, and see if it works
 @app.route('/<path:path>')
 def search(path=''):
     io = dosearch(path.replace(".json",""))
@@ -280,6 +281,7 @@ def search(path=''):
         return render_template('search/index.html', io=io)
 
 
+# code from bibserver - need to review what it does and why, and see if it works
 def dosearch(path,searchtype='identifier'):
     # prevent UnboundLocalError: local variable X referenced before assignment errors by initialising some variables
     args = {}
