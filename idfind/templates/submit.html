@@ -13,6 +13,41 @@ jQuery(document).ready(function() {
         }
     }
     jQuery('input[name=test_or_desc]').bind('change',updateform);
+
+	// "add more" button for Useful links
+	$('#more_links').click( function () {
+    /* There is no easy way to get the outerHTML of an element in jQuery.
+     * This is needed since we want to duplicate the useful link <input>.
+     * The code below does .clone().wrap('<p>').parent().html()
+     *
+     * The way it works is that it takes the first element with a certain
+     * class, makes a clone of it in RAM, wraps with a P tag, gets the parent 
+     * of it (meaning the P tag), and then gets the innerHTML property of that.
+     * So we end up copying the element we just selected, which is our goal.
+     
+     * The clone() means we're not actually disturbing the DOM. Without it
+     * all elements with a certain class will be wrapped in a P tag which is
+     * undesirable.
+     */
+    
+        var copyOfElem = $('.useful-link').clone().wrap('<p>').parent().html();
+        // now we've got a copy of the useful link <input> tag
+        
+        // let's insert it right before the "add more" button
+        $('#useful_links_group').append(copyOfElem);
+        
+		return false; // prevent form submission
+	});
+    
+	// "add more" button for Tags
+	$('#more_tags').click( function () {
+		var curwidth = $('#tags').width();
+		/* Another 100 pixels should be good on most devices and the user
+		 * shouldn't even have to click the "add more" button again, but
+		 * they can if they want to - so 100 should be a good increment. */
+		$('#tags').width(curwidth + 100);
+		return false; // prevent form submission
+	});
 });
 </script>
 
@@ -119,10 +154,13 @@ jQuery(document).ready(function() {
         </div>
 		
 		<div class="clearfix">
-        <label for="useful_link1">Useful links</label>
+        <label for="useful_links[]">Useful links</label>
         <div class="input">
-            <input class="span6" type="text" name="useful_link1" /> 
+            <div id="useful_links_group">
+                <input class="span6 useful-link" type="text" name="useful_links[]"/>
+            </div>
             <a id="more_links" class="btn" href="">add more</a>
+            <div class="clearfix"></div>
         <span class="help-block">
         Any additional useful links related to the identifier you're describing, 
         e.g. a page explaining the purpose of the identifier, maybe wikipedia or 

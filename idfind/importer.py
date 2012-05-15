@@ -26,13 +26,6 @@ class Importer(object):
         else:
             resptest_type = ''
             resptest_cond = ''
-        
-        # TODO - multiple useful links handling
-        # Basically, needs to be a variant of multiple tag handling (below)
-        # although in this case the links will be coming from multiple fields,
-        # not a single field. In any case, if the user didn't specify any links
-        # we need to end up with an empty list []. Otherwise, a list of URL-s.
-        useful_links = [request.values.get("useful_link1",'')]
             
         record = {
             "name": request.values['name'], # guaranteed to have 'name'
@@ -43,15 +36,8 @@ class Importer(object):
             "resptest_type": resptest_type,
             "resptest_cond": resptest_cond,
             "description": request.values.get("description",''),
-            # TODO: refactor useful links handling below (and perhaps submit.html template) to allow for multiple useful links
-            "useful_links": useful_links,
-            
-            # for tags - return no empty strings as tags, trim whitespace on 
-            # both ends of individual tags; but only check for empty strings
-            # AFTER splitting and trimming the individual strings - prevents
-            # things like "tag1, tag2, " from inserting an empty tag at the
-            # end: e.g. don't want ["tag1", "tag2", ""]
-            "tags": [final_tag for final_tag in [tag.strip() for tag in request.values.get("tags",'').split(",")] if final_tag], 
+            "useful_links": self._clean_list(request.values.getlist('useful_links[]')),
+            "tags": self._clean_list(request.values.get("tags",'').split(",")), 
             "created": datetime.now().isoformat(),
             "modified": datetime.now().isoformat(),
             "owner": self.owner.id,
@@ -104,3 +90,25 @@ class Importer(object):
         test['votes_feedback'] = test.data.get('votes_feedback', 0) + 1
         
         test.save()
+        
+    def _clean_list(self, list):
+        '''Clean up a list coming from an HTML form. Returns a list.
+        Returns an empty list if given an empty list.
+        
+        How to use: clean_list = self._clean_list(your_list), can use anywhere
+        where you've got a list.
+
+        Example: you have a list of tags. This is coming in from the form
+        as a single string: e.g. "tag1, tag2, ".
+        You do tag_list = request.values.get("tags",'').split(",")
+        Now you have the following list: ["tag1"," tag2", ""]
+        You want to both trim the whitespace from list[1] and remove the empty
+        element - list[2]. self._clean_list(tag_list) will do it.
+        
+        What it does (a.k.a. algorithm):
+        1. Trim whitespace on both ends of individual strings
+        2. Remove empty strings
+        3. Only check for empty strings AFTER splitting and trimming the 
+        individual strings (in order to remove empty list elements).
+        '''
+        return [clean_item for clean_item in [item.strip() for item in list] if clean_item]
