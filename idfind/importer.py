@@ -96,7 +96,7 @@ class Importer(object):
         Returns an empty list if given an empty list.
         
         How to use: clean_list = self._clean_list(your_list), can use anywhere
-        where you've got a list.
+        in this class where you've got a list.
 
         Example: you have a list of tags. This is coming in from the form
         as a single string: e.g. "tag1, tag2, ".
@@ -111,4 +111,6 @@ class Importer(object):
         3. Only check for empty strings AFTER splitting and trimming the 
         individual strings (in order to remove empty list elements).
         '''
+        # consider moving this method out to dao.py or somewhere where it can
+        # be reused more easily - it is really generic
         return [clean_item for clean_item in [item.strip() for item in list] if clean_item]
