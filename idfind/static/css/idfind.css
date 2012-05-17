@@ -45,16 +45,17 @@ input.frontin:hover{
 /************************************
   * Submitting a new test/description page
   ***********************************/
-div#useful_links_group {
+div.input-grp-for-addmore {
     float: left;
     margin-right: 0.25em;
 }
   
-input.useful-link {
+.input-for-addmore {
+	float:none;
     display:block;
     margin-bottom:0.25em;
 }
 
-a#more_links {
+a.add-more-btn {
     float: left;
 }

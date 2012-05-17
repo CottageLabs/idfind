@@ -19,22 +19,33 @@ class Importer(object):
             if not ( pre.startswith('http://') or pre.startswith('https://') ):
                 pre = 'http://' + pre
         
-        resptest = request.values.get("resptest",'')
-        if resptest:
-            resptest_type = request.values.get("resptest_type",'')
-            resptest_cond = request.values.get("resptest_cond",'')
-        else:
-            resptest_type = ''
-            resptest_cond = ''
+        # process multiple success response tests - up to 100
+        # python, why you no have a better getlist() CGI iface function?!
+        resptests = []
+        resptest = {}
+        for test_seq in range(0,100):
+        
+            next_resptest = 'resptests[' + str(test_seq) + ']'
+            next_resptest_content = next_resptest + '[str]'
+
+            if next_resptest_content in request.values:
+                print next_resptest, request.values[next_resptest_content].strip()
+                if request.values[next_resptest_content].strip():
+                # is the content field filled for this line?
+                    resptest['type'] = request.values[next_resptest + '[type]'].strip()
+                    resptest['cond'] = request.values[next_resptest + '[cond]'].strip()
+                    resptest['str'] = request.values[next_resptest_content].strip()
+                    resptests.append(resptest.copy())
+            else:
+            # no more tests submitted
+                break
             
         record = {
             "name": request.values['name'], # guaranteed to have 'name'
             "regex": request.values.get("regex",''),
             "url_prefix": pre,
             "url_suffix": request.values.get("url_suffix",''),
-            "resptest": resptest,
-            "resptest_type": resptest_type,
-            "resptest_cond": resptest_cond,
+            "resptests": resptests,
             "description": request.values.get("description",''),
             "useful_links": self._clean_list(request.values.getlist('useful_links[]')),
             "tags": self._clean_list(request.values.get("tags",'').split(",")), 

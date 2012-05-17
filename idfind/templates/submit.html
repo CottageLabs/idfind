@@ -14,8 +14,44 @@ jQuery(document).ready(function() {
     }
     jQuery('input[name=test_or_desc]').bind('change',updateform);
 
+	var test_seq = 0;
+	// "add more" button for Success Responses
+	$('#more_responses').click( function () {
+        test_seq = test_seq + 1;
+		
+        // Insert a copy of the all the <input> tags wrapped in a div right 
+		// before the "add more" button.
+		// getOuterHTML is a homebrew f(), not a jQuery one!
+		var tempHTML = getOuterHTML('.resp-grpinput');
+		tempHTML = tempHTML.replace(/0/g, test_seq);
+        $('#success_responses_group').append(tempHTML);
+		return false; // prevent form submission
+	});
+	
 	// "add more" button for Useful links
 	$('#more_links').click( function () {
+        
+        // Insert a copy of the useful link <input> tag right before the 
+		// "add more" button.
+		// getOuterHTML is a homebrew f(), not a jQuery one!
+        $('#useful_links_group').append(getOuterHTML('.useful-link'));
+        
+		return false; // prevent form submission
+	});
+    
+	// "add more" button for Tags
+	$('#more_tags').click( function () {
+		var curwidth = $('#tags').width();
+		/* Another 100 pixels should be good on most devices and the user
+		 * shouldn't even have to click the "add more" button again, but
+		 * they can if they want to - so 100 should be a good increment.
+		 */
+		$('#tags').width(curwidth + 100);
+		return false; // prevent form submission
+	});
+});
+
+function getOuterHTML(selector) {
     /* There is no easy way to get the outerHTML of an element in jQuery.
      * This is needed since we want to duplicate the useful link <input>.
      * The code below does .clone().wrap('<p>').parent().html()
@@ -29,26 +65,8 @@ jQuery(document).ready(function() {
      * all elements with a certain class will be wrapped in a P tag which is
      * undesirable.
      */
-    
-        var copyOfElem = $('.useful-link').clone().wrap('<p>').parent().html();
-        // now we've got a copy of the useful link <input> tag
-        
-        // let's insert it right before the "add more" button
-        $('#useful_links_group').append(copyOfElem);
-        
-		return false; // prevent form submission
-	});
-    
-	// "add more" button for Tags
-	$('#more_tags').click( function () {
-		var curwidth = $('#tags').width();
-		/* Another 100 pixels should be good on most devices and the user
-		 * shouldn't even have to click the "add more" button again, but
-		 * they can if they want to - so 100 should be a good increment. */
-		$('#tags').width(curwidth + 100);
-		return false; // prevent form submission
-	});
-});
+	return $(selector).clone().wrap('<p>').parent().html();
+}
 </script>
 
 <div class="action_box">
@@ -123,23 +141,28 @@ jQuery(document).ready(function() {
         <div class="clearfix fortest">
         <label for="url">Success response</label>
         <div class="input">
-            <select class="span2" name="resptest_type">
-                <option>header</option>
-                <option>body</option>
-            </select>
-            <select class="span2" name="resptest_cond">
-                <option>has</option>
-                <option>has not</option>
-            </select>
-            <input class="span2" type="text" name="resptest" />
-            <a id="more_responses" class="btn" href="">add more</a>
-        <span class="help-block">
-        We assume that if a service URL does not return a 404, 
-        then the identifier is valid. If, however, you have provided a service URL 
-        that operates differently, please tell us either the headers that signify 
-        success, or a string that we should search the response body for in the 
-        event of successful identification.
-        </span>
+			<div id="success_responses_group" class="input-grp-for-addmore">
+				<span class="resp-grpinput input-for-addmore">
+				<select class="span2" name="resptests[0][type]">
+					<option>header</option>
+					<option>body</option>
+				</select>
+				<select class="span2" name="resptests[0][cond]">
+					<option>has</option>
+					<option>has not</option>
+				</select>
+				<input class="span2" type="text" name="resptests[0][str]" />
+				</span>
+			</div>
+            <a id="more_responses" class="btn add-more-btn" href="">add more</a>
+			<div class="clearfix"></div>
+			<span class="help-block">
+			We assume that if a service URL does not return a 404, 
+			then the identifier is valid. If, however, you have provided a service URL 
+			that operates differently, please tell us either the headers that signify 
+			success, or a string that we should search the response body for in the 
+			event of successful identification.
+			</span>
         </div>
         </div>
 
@@ -156,17 +179,17 @@ jQuery(document).ready(function() {
 		<div class="clearfix">
         <label for="useful_links[]">Useful links</label>
         <div class="input">
-            <div id="useful_links_group">
-                <input class="span6 useful-link" type="text" name="useful_links[]"/>
+            <div id="useful_links_group" class="input-grp-for-addmore">
+                <span class="useful-link input-for-addmore"><input class="span6" type="text" name="useful_links[]"/></span>
             </div>
-            <a id="more_links" class="btn" href="">add more</a>
+            <a id="more_links" class="btn add-more-btn" href="">add more</a>
             <div class="clearfix"></div>
-        <span class="help-block">
-        Any additional useful links related to the identifier you're describing, 
-        e.g. a page explaining the purpose of the identifier, maybe wikipedia or 
-        on the provider site, or perhaps alternative URLs to which the identifier 
-        can be sent that return useful information.
-        </span>
+			<span class="help-block">
+			Any additional useful links related to the identifier you're describing, 
+			e.g. a page explaining the purpose of the identifier, maybe wikipedia or 
+			on the provider site, or perhaps alternative URLs to which the identifier 
+			can be sent that return useful information.
+			</span>
         </div>
         </div>
 
