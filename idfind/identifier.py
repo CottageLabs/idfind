@@ -1,7 +1,7 @@
 import re
 import idfind.dao
-import urllib2
-from urllib2 import HTTPError, URLError
+import requests
+from requests import ConnectionError
 from datetime import datetime
 
 class Identificator(object):
@@ -68,18 +68,18 @@ class Identificator(object):
         url =  r['url_prefix'] + identifier + r['url_suffix']
         # print url
         try:
-            urllib2.urlopen(url)
-            return True
-        except HTTPError as e:
-            if (e.code == 401 or e.code == 403 or e.code == 402
-                or e.code == 406 or e.code == 407):
+            r = requests.get(url)
+            print r.status_code
+            if r.status_code in [200, 401, 402, 403, 406, 407]:
                 return True
-            return False
-        except URLError as e:
-            # URL doesn't exist
-            # (somebody has to check whether that particular code could mean other things like connection errors - I couldn't find a list of URLError code meanings... TODO
-            if e.reason[0] == 11001:
+            else:
                 return False
+        except RequestError as e:
+            print e
+            # something's wrong, e.g. nonexistent or malformed URL, timeout, etc.
+            # TODO better handling of this - detect the different exceptions
+            # Although what action would we take if we knew the exact error...?
+            return False
     
     def _save_stats(self, test_id, test_success):
         '''Save automatically generated statistics to the Test document in the index.

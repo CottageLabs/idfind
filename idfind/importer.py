@@ -12,12 +12,6 @@ class Importer(object):
     def submit(self, request):
         '''Import an identifer test or description into the index.'''
         
-        pre = request.values.get("url_prefix",'')
-        if pre:
-            if not pre.endswith('/'):
-                pre += '/'
-            if not ( pre.startswith('http://') or pre.startswith('https://') ):
-                pre = 'http://' + pre
         
         # process multiple success response tests - up to 100
         # python, why you no have a better getlist() CGI iface function?!
@@ -29,7 +23,6 @@ class Importer(object):
             next_resptest_content = next_resptest + '[str]'
 
             if next_resptest_content in request.values:
-                print next_resptest, request.values[next_resptest_content].strip()
                 if request.values[next_resptest_content].strip():
                 # is the content field filled for this line?
                     resptest['type'] = request.values[next_resptest + '[type]'].strip()
@@ -39,15 +32,20 @@ class Importer(object):
             else:
             # no more tests submitted
                 break
+                
+            tmpl = self._clean_list(request.values.getlist('useful_links[]'))
+            useful_links = []
+            for link in tmpl:
+                useful_links.append(self._prep_link(link))
             
         record = {
             "name": request.values['name'], # guaranteed to have 'name'
             "regex": request.values.get("regex",''),
-            "url_prefix": pre,
+            "url_prefix": self._prep_link(request.values.get("url_prefix",''), True),
             "url_suffix": request.values.get("url_suffix",''),
             "resptests": resptests,
             "description": request.values.get("description",''),
-            "useful_links": self._clean_list(request.values.getlist('useful_links[]')),
+            "useful_links": useful_links,
             "tags": self._clean_list(request.values.get("tags",'').split(",")), 
             "created": datetime.now().isoformat(),
             "modified": datetime.now().isoformat(),
@@ -125,3 +123,23 @@ class Importer(object):
         # consider moving this method out to dao.py or somewhere where it can
         # be reused more easily - it is really generic
         return [clean_item for clean_item in [item.strip() for item in list] if clean_item]
+        
+    def _prep_link(self, link, endslash=False):
+        '''Prepare a string which is meant to be a link (HTTP URL) for
+        indexing. Puts http:// at the front if the string it's passed does not
+        already start with http:// or https://.
+        
+        The endslash parameter is a Boolean which controls whether a forward
+        slash '/' will be added to the string if the string doesn't already
+        end with a '/'.
+        
+        Returns an empty string if passed an empty string (so you will never
+        end up with 'http:///' or something of the sort).
+        '''
+        if link:
+            if endslash and not link.endswith('/'):
+                link += '/'
+            if not ( link.startswith('http://') or link.startswith('https://') ):
+                link = 'http://' + link
+            
+        return link
