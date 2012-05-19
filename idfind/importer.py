@@ -33,10 +33,10 @@ class Importer(object):
             # no more tests submitted
                 break
                 
-            tmpl = self._clean_list(request.values.getlist('useful_links[]'))
-            useful_links = []
-            for link in tmpl:
-                useful_links.append(self._prep_link(link))
+        tmpl = self._clean_list(request.values.getlist('useful_links[]'))
+        useful_links = []
+        for link in tmpl:
+            useful_links.append(self._prep_link(link))
             
         record = {
             "name": request.values['name'], # guaranteed to have 'name'
