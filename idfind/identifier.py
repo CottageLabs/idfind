@@ -1,7 +1,7 @@
 import re
 import idfind.dao
 import requests
-from requests import ConnectionError
+from requests import RequestException
 from datetime import datetime
 
 class Identificator(object):
@@ -68,12 +68,34 @@ class Identificator(object):
         url =  r['url_prefix'] + identifier + r['url_suffix']
         # print url
         try:
-            r = requests.get(url)
-            if r.status_code in [200, 401, 402, 403, 406, 407]:
+            req = requests.get(url)
+            if r['resptests']:
+                for test in r['resptests']:
+                    if test['type'] == 'header':
+                        search_in = req.headers.iteritems()
+                    elif test['type'] == 'body':
+                        # Convert the string to a list with 1 element,
+                        # that element is a tuple with an empty 2nd value.
+                        # This is the same format as the headers of a request.
+                        # So now we can iterate over the content of a request
+                        # using the same code for "header" and "body" type 
+                        # tests - below.
+                        search_in = [(req.text,'')]
+                        
+                    for (k, v) in search_in:
+                        if test['cond'] == 'has':
+                            if test['str'] in k or test['str'] in v:
+                                return True
+                        if test['cond'] == 'has not':
+                            if test['str'] not in k and test['str'] not in v:
+                                return True
+                return False
+                        
+            if req.status_code in [200, 401, 402, 403, 406, 407]:
                 return True
             else:
                 return False
-        except RequestError as e:
+        except RequestException as e:
             print e
             # something's wrong, e.g. nonexistent or malformed URL, timeout, etc.
             # TODO better handling of this - detect the different exceptions
