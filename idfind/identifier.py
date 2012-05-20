@@ -69,7 +69,6 @@ class Identificator(object):
         # print url
         try:
             r = requests.get(url)
-            print r.status_code
             if r.status_code in [200, 401, 402, 403, 406, 407]:
                 return True
             else:
