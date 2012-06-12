@@ -70,9 +70,10 @@ class Identificator(object):
         try:
             req = requests.get(url)
             if r['resptests']:
+                resptests_result = True
                 for test in r['resptests']:
                     if test['type'] == 'header':
-                        search_in = req.headers.iteritems()
+                        test_subject = req.headers.iteritems()
                     elif test['type'] == 'body':
                         # Convert the string to a list with 1 element,
                         # that element is a tuple with an empty 2nd value.
@@ -80,16 +81,21 @@ class Identificator(object):
                         # So now we can iterate over the content of a request
                         # using the same code for "header" and "body" type 
                         # tests - below.
-                        search_in = [(req.text,'')]
+                        test_subject = [(req.text,'')]
                         
-                    for (k, v) in search_in:
+                    for (k, v) in test_subject:
                         if test['cond'] == 'has':
                             if test['str'] in k or test['str'] in v:
-                                return True
+                                resptests_result = resptests_result and True
+                            else:
+                                resptests_result = False
+                                
                         if test['cond'] == 'has not':
                             if test['str'] not in k and test['str'] not in v:
-                                return True
-                return False
+                                resptests_result = resptests_result and True
+                            else:
+                                resptests_result = False
+                return resptests_result
                         
             if req.status_code in [200, 401, 402, 403, 406, 407]:
                 return True

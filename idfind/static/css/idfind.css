@@ -10,6 +10,11 @@ form{
     display:inline;
 }
 
+/* Remove bottom margin from lists within tables. */
+td ul, ol {
+	margin-bottom: 0;
+}
+
 /************************************
   * Flash notifications / messages
   ***********************************/

@@ -89,7 +89,7 @@
 					<tr>
 						<td>Response conditions</td>
 						<td>
-						<ul style="margin-bottom: 0;">
+						<ul>
 						{% for rc in thing['_source']['resptests'] %}
 							<li>{{rc['type']}} {{rc['cond']}} "{{rc['str']}}"</li>
 						{% endfor %}

@@ -14,8 +14,8 @@ jQuery(document).ready(function() {
     }
     jQuery('input[name=test_or_desc]').bind('change',updateform);
 
-	var test_seq = 0;
 	// "add more" button for Success Responses
+	var test_seq = 0;
 	$('#more_responses').click( function () {
         test_seq = test_seq + 1;
 		
@@ -25,6 +25,7 @@ jQuery(document).ready(function() {
 		var tempHTML = getOuterHTML('.resp-grpinput');
 		tempHTML = tempHTML.replace(/0/g, test_seq);
         $('#success_responses_group').append(tempHTML);
+		$('#test_' + test_seq + '_logical_operator').show();
 		return false; // prevent form submission
 	});
 	
@@ -143,6 +144,7 @@ function getOuterHTML(selector) {
         <div class="input">
 			<div id="success_responses_group" class="input-grp-for-addmore">
 				<span class="resp-grpinput input-for-addmore">
+				<span id="test_0_logical_operator" style="display: none;">AND</span>
 				<select class="span2" name="resptests[0][type]">
 					<option>header</option>
 					<option>body</option>
