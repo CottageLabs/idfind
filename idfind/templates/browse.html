@@ -85,14 +85,20 @@
 					</tr>
 					{% endif %}
 					
-					{% if thing['_source']['resptest'] %}
+					{% if thing['_source']['resptests'] %}
 					<tr>
-						<td>Response condition</td>
-						<td>{{thing['_source']['resptest_type']}} {{thing['_source']['resptest_cond']}} {{thing['_source']['resptest']}}</td>
+						<td>Response conditions</td>
+						<td>
+						<ul style="margin-bottom: 0;">
+						{% for rc in thing['_source']['resptests'] %}
+							<li>{{rc['type']}} {{rc['cond']}} "{{rc['str']}}"</li>
+						{% endfor %}
+						</ul>
+						</td>
 					</tr>
 					{% endif %}
 					
-					{% if thing['_source']['useful_links'][0] %}
+					{% if thing['_source']['useful_links'] %}
 					<tr>
 						<td>Learn more</td>
 						<td>
