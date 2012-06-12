@@ -52,14 +52,14 @@
 					
 					{% if thing['_source']['score_feedback'] %}
 					<tr>
-						<td>Accuracy score (from user feedback)</td>
+						<td>Accuracy (user feedback)</td>
 						<td>{{thing['_source']['score_feedback']}}</td>
 					</tr>
 					{% endif %}
 					
 					{% if thing['_source']['votes_feedback'] %}
 					<tr>
-						<td>Number of raters</td>
+						<td>Times rated</td>
 						<td>{{thing['_source']['votes_feedback']}}</td>
 					</tr>
 					{% endif %}
