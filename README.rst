@@ -18,8 +18,8 @@ Install
 =======
 
 1. Install stuff:
-   * Python_ (2.7+ preferable; NOT TESTED on 3.x)
-   * ElasticSearch_ (0.19 series) (tested and should run on 0.17 and up)
+   - Python_ (2.7+ preferable; NOT TESTED on 3.x)
+   - ElasticSearch_ (0.19 series) (tested and should run on 0.17 and up)
 
 2. [optional] Create a virtualenv and enable it::
 
