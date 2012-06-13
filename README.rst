@@ -33,13 +33,13 @@ Install
     mkdir {myenv}/src
     git clone https://github.com/cottagelabs/idfind {myenv}/src/
 
-3. Install the app::
+4. Install the app::
 
     cd {myenv}/src/idfind
     # for dev install:
     pip install -e .
 
-4. Run the webserver::
+5. Run the webserver::
 
     python idfind/web.py
 
