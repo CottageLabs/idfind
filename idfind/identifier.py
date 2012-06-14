@@ -10,13 +10,21 @@ class Identificator(object):
     def identify(self, identifier):
         success = []
         # get all of the regular expressions
-        d = {'start' : 0, 'size' : 100, 'sort':[{"score_feedback":"asc"}]};
-        while True:
-            regexes = idfind.dao.Test.query(**d)
-            if len(regexes['hits']['hits']) == 0:
-                break
-            d = {'start' : d['start'] + d['size'], 'size' : 100}
-            success += self._check_regexes(identifier, regexes['hits']['hits'])
+        regexes = idfind.dao.Test.query()
+        
+        # Only proceed if there are actually any tests for us to run.
+        # Need to do a separate query before the one below since the one below
+        # will cause an elasticsearch exception if there are no tests in the
+        # index, due to the 'sort' keyword argument.
+        if regexes['hits']['total'] != 0:
+            d = {'start' : 0, 'size' : 100, 'sort':[{"score_feedback":"asc"}]};
+            while True:
+                regexes = idfind.dao.Test.query(**d)
+                if regexes['hits']['total'] == 0:
+                    break
+                d = {'start' : d['start'] + d['size'], 'size' : 100}
+                success += self._check_regexes(identifier, regexes['hits']['hits'])
+                
         return success
         
     def _check_regexes(self, identifier, regexes):
@@ -56,6 +64,10 @@ class Identificator(object):
         return success
     
     def _check_expression(self, identifier, regex):
+        # TODO IMPORTANT: wrap this code in exception handling, if any user 
+        # submits an invalid regex, NO identification can take place (since 
+        # all tests are executed for every identifier, thus the invalid test 
+        # is ALWAYS executed, causing IDFind to crash)
         result = re.match(regex['regex'], identifier)
         return result
     
