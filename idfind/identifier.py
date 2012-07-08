@@ -1,12 +1,10 @@
 import re
-import idfind.dao
 import requests
 from requests import RequestException
 from datetime import datetime
-from sys import version_info as pyver
 
-# when recording regex errors, include Python version
-python_version = str(pyver.major) + '.' + str(pyver.minor) + '.' + str(pyver.micro) + '.' + str(pyver.releaselevel) + '.' + str(pyver.serial)
+import idfind.dao
+from idfind.config import config
 
 class Identificator(object):
     def __init__(self): pass
@@ -76,11 +74,11 @@ class Identificator(object):
             if 'regex_errors' not in test:
                 test['regex_errors'] = {}
             
-            if python_version not in test['regex_errors']:
-                test['regex_errors'][python_version] = []
+            if config['running_python_version'] not in test['regex_errors']:
+                test['regex_errors'][config['running_python_version']] = []
             
-            if e.message not in test['regex_errors'][python_version]:
-                test['regex_errors'][python_version].append(e.message)
+            if e.message not in test['regex_errors'][config['running_python_version']]:
+                test['regex_errors'][config['running_python_version']].append(e.message)
             test.save()
             
         return result

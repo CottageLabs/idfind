@@ -1,4 +1,5 @@
 import json
+from sys import version_info as pyver
 
 '''read the config.json file and make available as a config dict'''
 
@@ -15,6 +16,9 @@ def load_config(path):
     # add some critical defaults if necessary
     if 'facet_field' not in out:
         out['facet_field'] = ''
+    
+    # add dynamic pieces of information
+    out['running_python_version'] = str(pyver.major) + '.' + str(pyver.minor) + '.' + str(pyver.micro) + '.' + str(pyver.releaselevel) + '.' + str(pyver.serial)
 
     return out
 

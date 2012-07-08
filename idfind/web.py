@@ -1,14 +1,16 @@
+import re
+import json
+
 from flask import Flask, jsonify, json, request, redirect, abort, make_response
 from flask import render_template, flash
 from flask.views import View, MethodView
 from flaskext.login import login_user, current_user
 
-import json
-
 import idfind.identifier
 import idfind.dao
 import idfind.iomanager
 import idfind.importer
+from idfind.config import config
 from idfind.core import app, login_manager
 from idfind.view.account import blueprint as account
 from idfind import auth
@@ -235,6 +237,17 @@ class SubmitView(MethodView):
             abort(401)
         # TODO: need some better validation. see python flask docs for info.
         if 'test_or_desc' in request.values:
+            if request.values['test_or_desc'] == 'test':
+                if request.values['regex']:
+                    try:
+                        dummy = re.compile(request.values['regex'])
+                    except re.error as e:
+                        flash('There is a problem with the regular expression you have provided. Python needs to be able to understand it. Our Python (' + config['running_python_version'] + ') says: ' + e.message)
+                        return render_template('submit.html')
+                else:
+                    flash('You need to provide a regular expression when you\'re submitting a Test')
+                    return render_template('submit.html')
+            
             if request.values['name']:
                 importer = idfind.importer.Importer(owner=current_user)
                 importer.submit(request)
