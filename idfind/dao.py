@@ -3,6 +3,7 @@ import uuid
 import UserDict
 import httplib
 from datetime import datetime
+from sys import version_info as pyver
 
 import pyes
 from werkzeug import generate_password_hash, check_password_hash
