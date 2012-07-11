@@ -169,9 +169,15 @@ class Identifier(DomainObject):
             result['identifier'] = q
             idfind.dao.Identifier.upsert(result)
             
-        # neither cache search, nor regex identification succeeded    
+        # neither cache search, nor regex identification succeeded
         else:
-            idfind.dao.UIdentifier.upsert({'identifier':q})
+            # so now we'd like to record this identifier as "unknown"
+            # but first, we'll check the list of unknown identifiers
+            # so that we don't get duplicate records for the same id.
+            unknowns = idfind.dao.UIdentifier.query(q=q)
+            if unknowns['hits']['total'] == 0:
+                # there are no such unknown identifiers, so put this one up
+                idfind.dao.UIdentifier.upsert({'identifier':q})
         
         return answer
     
