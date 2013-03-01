@@ -151,8 +151,6 @@ class Identifier(DomainObject):
         Works as follows: 1. try cache; 2. try tests in the index; 3. it's an unknown one.
         
         :param q: string to try to identify
-        
-        TODO: instructions on where to look for the format of the answer dictionaries.
         '''
         # try the cache first
         chits = self.query(q=q) # cache hits
