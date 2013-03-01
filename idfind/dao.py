@@ -6,7 +6,7 @@ from datetime import datetime
 
 import pyes
 from werkzeug import generate_password_hash, check_password_hash
-from flaskext.login import UserMixin
+from flask.ext.login import UserMixin
 
 import idfind.identifier
 

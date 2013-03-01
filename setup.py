@@ -5,9 +5,10 @@ setup(
     version = '0.1',
     packages = find_packages(),
     install_requires = [
-        "Flask==0.7.2",
+        "Flask==0.9",
         "Flask-Login",
         "Flask-WTF",
+        "requests==1.1.0",
         "pyes==0.16"
 				],
     url = 'http://idfind.cottagelabs.com/',
