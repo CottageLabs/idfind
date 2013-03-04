@@ -2,11 +2,13 @@ import os
 from flask import Flask
 
 from idfind import default_settings
+from idfind.reverse_proxied import ReverseProxied
 from flask.ext.login import LoginManager, current_user
 login_manager = LoginManager()
 
 def create_app():
     app = Flask(__name__)
+    app.wsgi_app = ReverseProxied(app.wsgi_app)
     configure_app(app)
     setup_error_email(app)
     login_manager.setup_app(app)
