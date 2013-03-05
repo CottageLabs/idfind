@@ -3,7 +3,7 @@
 {% block content %}
 
       <div class="hero-unit">
-        <form action="/identify" method="POST" enctype="multipart/form-data">
+        <form action="{{ url_for('identify') }}" method="POST" enctype="multipart/form-data">
         <input class="frontin" type="text" name="q" value="/^(IDFind).*?$/" />
         </form>
         <p>ID Find is an identifier identifier!
@@ -16,28 +16,28 @@
           <div class="alert-message block-message info">
           <h2>Browse</h2>
           <p>Have a look at the tests and descriptions which help us identify identifiers.</p>
-          <p><a href="/browse" class="btn">Browse &raquo;</a></p>
+          <p><a href="{{ url_for('browse') }}" class="btn">Browse &raquo;</a></p>
           </div>
         </div>
         <div class="span4 column info">
           <div class="alert-message block-message info">
           <h2>Identify</h3>
           <p>You got a string, it looks like some sort of identifer, but which is it?</p>
-          <p><a href="/identify" class="btn">Identify &raquo;</a></p>
+          <p><a href="{{ url_for('identify') }}" class="btn">Identify &raquo;</a></p>
           </div>
         </div>
         <div class="span4 column">
           <div class="alert-message block-message info">
           <h2>Submit</h2>
           <p>Help us identify identifiers - submit a test or a description</p>
-          <p><a href="/submit" class="btn">Submit &raquo;</a></p>
+          <p><a href="{{ url_for('submit') }}" class="btn">Submit &raquo;</a></p>
           </div>
         </div>
         <div class="span4 column">
           <div class="alert-message block-message info">
           <h2>Rate</h2>
           <p>You used the service - now rate the quality of the response</p>
-          <p><a href="/rate" class="btn">Rate &raquo;</a></p>
+          <p><a href="{{ url_for('rate') }}" class="btn">Rate &raquo;</a></p>
           </div>
         </div>
       </div>

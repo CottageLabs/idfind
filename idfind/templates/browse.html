@@ -3,7 +3,7 @@
 {% block content %}
 <div class="action_box">
 	<h1>Tests and descriptions we use to identify identifiers</h1>
-	<p><a href="/submit">Submit a new one and see it appear on this page!</a></p>
+	<p><a href="{{ url_for('submit') }}">Submit a new one and see it appear on this page!</a></p>
 
     {% if things %}
 		{% for thing in things %}
@@ -147,7 +147,7 @@
 			</div>
 		{% endfor %}
 	{% else %}
-		<p>We don't have any tests or descriptions! Go on, <a href="/submit">submit one!</a></p>
+		<p>We don't have any tests or descriptions! Go on, <a href="{{ url_for('submit') }}">submit one!</a></p>
     {% endif %}
 
 </div>

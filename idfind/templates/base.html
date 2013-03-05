@@ -55,7 +55,7 @@
             </li>
             {% else %}
             <li>
-              <a alt="view your account" title="view your account" href="/account/{{current_user.id}}"><strong><input type="hidden" id="current_user" value="{{current_user.id}}" />{{current_user.id}}</strong></a>
+              <a alt="view your account" title="view your account" href="{{ url_for('account', user=current_user.id) }}"><strong><input type="hidden" id="current_user" value="{{current_user.id}}" />{{current_user.id}}</strong></a>
             </li>
             <li>
               <a href="{{ url_for('account.logout') }}">Logout</a>
@@ -96,8 +96,8 @@
         <div class="span6">
           <h4>About</h4>
           <ul>
-            <li><a href="/content/api">We have an API</a></li>
-            <li><a href="/content/api#twitter">Tweet @idfind - get responses back!</a></li>
+            <li><a href="{{ url_for('content', path='api') }}">We have an API</a></li>
+            <li><a href="{{ url_for('content', path='api', _anchor='twitter') }}">Tweet @idfind - get responses back!</a></li>
             <li><a href="https://github.com/cottagelabs/idfind/issues">Feedback</a></li>
             <li><a href="https://github.com/cottagelabs/idfind">Source Code</a></li>
           </ul>

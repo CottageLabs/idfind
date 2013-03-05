@@ -7,6 +7,9 @@ it tries to identify it and passes back the result as a tweet'''
 import twitter
 import re
 from time import sleep
+
+from flask import url_for
+
 import idfind.dao
 import idfind.identifier
 from idfind.config import config
@@ -98,7 +101,7 @@ class TweetListen(object):
                                     tweetreply += result['url_suffix']
                                 tweetreply += '; '
                                 
-                            tweetreply += 'info @ ' + self.homeurl + '/identify/' + q
+                            tweetreply += 'info @ ' + self.homeurl + url_for('identify') + '/' + q
                             
                             debug_prefix = 'Got it'
                         else:

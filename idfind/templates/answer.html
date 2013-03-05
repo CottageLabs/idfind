@@ -53,7 +53,7 @@
 			
 			<tr>
 				<td>Test used</td>
-				<td><a href="/browse#{{item['name']}}">{{item['name']}}</a></td>
+				<td><a href="{{ url_for('browse', _anchor=item['name']) }}">{{item['name']}}</a></td>
 			</tr>
 			
 			<tr>
@@ -92,7 +92,7 @@
     
         <h2>We don't know!</h2>
         
-        <p>Why not <a href="/submit">submit</a> an identifier test for it?</p>
+        <p>Why not <a href="{{ url_for('submit') }}">submit</a> an identifier test for it?</p>
     
     {% endif %}
 
