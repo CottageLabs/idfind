@@ -1,7 +1,7 @@
 import re
 import json
 
-from flask import Flask, jsonify, json, request, redirect, abort, make_response
+from flask import Flask, jsonify, json, request, redirect, abort, make_response, url_for
 from flask import render_template, flash
 from flask.views import View, MethodView
 from flask.ext.login import login_user, current_user
@@ -16,7 +16,6 @@ from idfind.view.account import blueprint as account
 from idfind import auth
 
 app.register_blueprint(account, url_prefix='/account')
-
 
 # NB: the decorator appears to kill the function for normal usage
 @login_manager.user_loader
@@ -60,8 +59,7 @@ def account(user):
         if user == current_user.id:
             return render_template('account/view.html',current_user=current_user)
     flash('You are not that user. Or you are not logged in.')
-    return redirect('/account/login')
-
+    return redirect(url_for('account.login'))
 
 @app.route('/content/<path:path>')
 def content(path):
@@ -200,7 +198,7 @@ class RateView(MethodView):
     def get(self):
         if not auth.collection.create(current_user, None):
             flash('You need to login to rate a regex')
-            return redirect('/account/login')
+            return redirect(url_for('account.login'))
         if request.values.get("test_worked") is not None:
             return self.post()
             
@@ -215,7 +213,7 @@ class RateView(MethodView):
         importer = idfind.importer.Importer(owner=current_user)
         importer.rate(request)
         flash('Successfully received your rating')
-        return redirect('/')
+        return redirect(url_for('home'))
 
 app.add_url_rule('/rate', view_func=RateView.as_view('rate'))
 
@@ -227,7 +225,7 @@ class SubmitView(MethodView):
     def get(self):
         if not auth.collection.create(current_user, None):
             flash('You need to login to be able to submit.')
-            return redirect('/account/login')
+            return redirect(url_for('account.login'))
         if request.values.get("test_or_desc") is not None:
             return self.post()
         return render_template('submit.html')
@@ -252,7 +250,7 @@ class SubmitView(MethodView):
                 importer = idfind.importer.Importer(owner=current_user)
                 importer.submit(request)
                 flash('Successfully received %s' % request.values["test_or_desc"])
-                return redirect('/browse#' + request.values['name'])
+                return redirect(url_for('browse', _anchor=request.values['name']))
             else:
                 flash('We need a name for your test / description')
                 return render_template('submit.html')
@@ -293,7 +291,6 @@ def search(path=''):
         return outputJSON(results=io.results)
     else:
         return render_template('search/index.html', io=io)
-
 
 # code from bibserver - need to review what it does and why, and see if it works
 def dosearch(path,searchtype='identifier'):

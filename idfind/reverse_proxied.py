@@ -1,4 +1,4 @@
-# taken from http://flask.pocoo.org/snippets/35/
+# taken from http://flask.pocoo.org/snippets/35/ (public domain)
 # after reading http://stackoverflow.com/questions/7558249/nginx-configuration-for-static-sites-in-root-directory-flask-apps-in-subdirecto
 
 class ReverseProxied(object):
