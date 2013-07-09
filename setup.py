@@ -9,7 +9,8 @@ setup(
         "Flask-Login",
         "Flask-WTF",
         "requests==1.1.0",
-        "pyes==0.16"
+        "pyes==0.16",
+        "twitter==1.10",
 				],
     url = 'http://idfind.cottagelabs.com/',
     author = 'Cottage Labs',

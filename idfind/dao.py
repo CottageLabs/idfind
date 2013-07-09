@@ -2,6 +2,7 @@ import json
 import uuid
 import UserDict
 import httplib
+import logging
 from datetime import datetime
 
 import pyes
@@ -9,6 +10,9 @@ from werkzeug import generate_password_hash, check_password_hash
 from flask.ext.login import UserMixin
 
 import idfind.identifier
+
+requests_log = logging.getLogger("requests")
+requests_log.setLevel(logging.WARNING)
 
 def init_db():
     conn, db = get_conn()
@@ -79,6 +83,8 @@ class DomainObject(UserDict.IterableUserDict):
 
     @classmethod
     def delete_by_query(cls, query):
+        query = query.replace('/', '\/')
+
         url = "127.0.0.1:9200"
         loc = idfind + "/" + cls.__type__ + "/_query?q=" + query
         conn = httplib.HTTPConnection(url)
@@ -96,6 +102,8 @@ class DomainObject(UserDict.IterableUserDict):
         :param kwargs: any keyword args as per
             http://www.elasticsearch.org/guide/reference/api/search/uri-request.html
         '''
+        q = q.replace('/', '\/')
+
         conn, db = get_conn()
         if not q:
             ourq = pyes.query.MatchAllQuery()
@@ -120,6 +128,8 @@ class DomainObject(UserDict.IterableUserDict):
 
     @classmethod
     def raw_query(self, query_string):
+        query_string = query_string.replace('/', '\/')
+
         if not query_string:
             msg = json.dumps({
                 'error': "Query endpoint. Please provide elastic search query parameters - see http://www.elasticsearch.org/guide/reference/api/search/uri-request.html"

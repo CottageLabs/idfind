@@ -5,8 +5,12 @@
 it tries to identify it and passes back the result as a tweet'''
 
 import twitter
+import json
 import re
+import logging
+import sys
 from time import sleep
+import requests
 
 from flask import url_for
 
@@ -14,32 +18,57 @@ import idfind.dao
 import idfind.identifier
 from idfind.config import config
 
+requests_log = logging.getLogger("requests")
+requests_log.setLevel(logging.WARNING)
+
+LOG_FORMAT = '%(asctime)-15s :: %(message)s'
+logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
+log = logging.getLogger(__name__)
+
 class TweetListen(object):
     api = None
     homeurl = config['TWEETLISTEN_BASE_URL']
     check_for = None # string to be used as regex later: @account_name, where the twitter username is whatever our twitter account is called
     
     def __init__(self):
-        credentials = idfind.dao.TwitterCreds.query(q='*')
+        credentials = self.get_twitter_creds()
         
-        if credentials['hits']['total'] != 0:
-            self.api = twitter.Api(
-            consumer_key = credentials['hits']['hits'][0]['_source']['consumer_key'],
-            consumer_secret = credentials['hits']['hits'][0]['_source']['consumer_secret'],
-            access_token_key = credentials['hits']['hits'][0]['_source']['access_token_key'],
-            access_token_secret = credentials['hits']['hits'][0]['_source']['access_token_secret']
+        if credentials:
+            self.api = twitter.Twitter(
+                auth=twitter.OAuth(
+                    credentials['oauth_token'],
+                    credentials['oauth_secret'],
+                    credentials['consumer_key'],
+                    credentials['consumer_secret']
+                )
             )
-            
-            user = self.api.VerifyCredentials()
-            
+
+           
+            user = self.api.account.verify_credentials()
+
             if user:
-                name = user.GetScreenName()
+                name = user['screen_name']
                 self.check_for = '@' + name + ' (.+)'
             else:
-                raise Exception('Oops, invalid twitter credentials!')
+                fail('Oops, invalid twitter credentials')
                 
         else:
-            raise Exception('Oops, you need to index the twitter credentials into elasticsearch first!')
+            fail(
+            '''Oops, you need to put the twitter credentials into {0}
+first! The twitter service is looking for a JSON dictionary with
+"consumer_key", "consumer_secret", "access_token_key" and
+"access_token_secret" defined. You can get these by logging into
+https://dev.twitter.com as the idfind user. Ask the maintainer of this
+package for the password.'''.format(config['TWITTER_CREDENTIALS_FILE'])
+            )
+
+        idfind.dao.init_db() # create the idfind index if it doesn't exist already
+
+    @classmethod
+    def get_twitter_creds(cls):
+        with open(config['TWITTER_CREDENTIALS_FILE'], 'rb') as f:
+            credentials = json.loads(f.read())
+        return credentials
 
     def save_lastid(self, last_proc_tweet):
         
@@ -68,24 +97,22 @@ class TweetListen(object):
             lm = self.get_lastid()
             
             if lm:
-                mentions = self.api.GetMentions(since_id = lm)
+                mentions = self.api.statuses.mentions_timeline(since_id=lm)
             else:
-                mentions = self.api.GetMentions()
+                mentions = self.api.statuses.mentions_timeline()
             
             mentions.reverse()
             
             for status in mentions:
-                # uncomment to see info about every tweet which is being processed
-                # print status.created_at + '  ' + str(status.id) + '  ' + status.user.screen_name + '  ' + status.text 
                 try:
-                    match = regex.search(status.text)
+                    match = regex.search(status['text'])
                     
                     if match:
                         q = match.group(1)
                         
-                        # print q # debug
+                        log.debug(q)
                         
-                        tweetreply = '@' + status.user.screen_name + ' '
+                        tweetreply = '@' + status['user']['screen_name'] + ' '
                         
                         answer = idfind.dao.Identifier.identify(q=q)
                         
@@ -96,12 +123,11 @@ class TweetListen(object):
                             if result['url_prefix']:
                                 tweetreply += result['url_prefix']
                                 tweetreply += q
-                                # We can't have a URL Suffix WITHOUT a URL Prefix, can we?
                                 if result['url_suffix']:
                                     tweetreply += result['url_suffix']
                                 tweetreply += '; '
                                 
-                            tweetreply += 'info @ ' + self.homeurl + url_for('identify') + '/' + q
+                            tweetreply += 'info @ ' + self.homeurl + '/identify' + '/' + q
                             
                             debug_prefix = 'Got it'
                         else:
@@ -109,19 +135,32 @@ class TweetListen(object):
                             tweetreply += 'Unknown identifier.'
                             debug_prefix = 'Unknown identifier'
                             
-                        print debug_prefix + ' ::: Tweet ID: ' + str(status.id) + ', Text: "' + status.text + '"' + ', Asker: ' + status.GetUser().GetScreenName()
+                        log.info('{debug} == Time: {status[created_at]}, ID: {status[id_str]}, Asker: {status[user][screen_name]}, Text: {status[text]}'.format(debug=debug_prefix, status=status))
                             
-                        self.save_lastid(status.id) # create/replace the ES document containing the last-processed tweet id
-                        self.api.PostUpdate(tweetreply, in_reply_to_status_id = status.id)
+                        self.save_lastid(status['id']) # create/replace the ES document containing the last-processed tweet id
+                        self.api.statuses.update(status=tweetreply, in_reply_to_status_id=status['id'])
                       
                     else:
-                        print str(status.id) + ' ' + status.text + 'This tweet doesn\'t match the regex with the project\'s username: ' + self.check_for
+                        log.warn(str(status['id']) + ' ' + status['text'] + 'This tweet doesn\'t match the regex with the project\'s username: ' + self.check_for)
                     
 
                 except twitter.TwitterError as error:
-                    print 'Twitter error while processing tweet (id = ' + str(status.id) + ' ); Error was: ' + error.args[0]
+                    log.error('Twitter error while processing tweet (id = ' + str(status['id']) + ' ); Error was: ' + str(error))
                     
             sleep(61) # sleep a minute - make sure we are not getting cached responses from the python-twitter library
-        
-x = TweetListen()
-x.listen()
+
+def fail(msg):
+    log.critical(msg)
+    raise Exception(msg)
+
+def main(argv=None):
+
+    if not argv:
+        argv = sys.argv
+
+    x = TweetListen()
+    x.listen()
+
+
+if __name__ == '__main__':
+    main()

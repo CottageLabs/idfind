@@ -7,6 +7,7 @@
 	
 	# provide tweetlisten with the base site url (but don't want to overwrite what it might otherwise be calculated to be for the rest of the code)
 	"TWEETLISTEN_BASE_URL" : "http://idfind.cottagelabs.com",
+    "TWITTER_CREDENTIALS_FILE": "twitter_credentials.json",
 
     # base URL of search service
     "base_url" : "/search",

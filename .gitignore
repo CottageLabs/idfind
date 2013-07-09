@@ -6,3 +6,5 @@ sandbox/*
 src*
 build*
 dist*
+
+twitter_credentials.json
