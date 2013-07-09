@@ -138,7 +138,7 @@ def description(did=None):
         return render_template('description.html', io=io)
 
 @app.route('/identify', methods=['GET','POST'])
-@app.route('/identify/<therest>', methods=['GET','POST'])
+@app.route('/identify/<path:therest>', methods=['GET','POST'])
 def identify(therest=''):
     JSON = False
     
