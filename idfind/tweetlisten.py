@@ -130,6 +130,8 @@ package for the password.'''.format(config['TWITTER_CREDENTIALS_FILE'])
                         if answer:
                         # we've got this identifier
                             result = answer[0]
+
+                            tweetreply += result['name'] + '-> '
                             
                             if result['url_prefix']:
                                 tweetreply += result['url_prefix']
