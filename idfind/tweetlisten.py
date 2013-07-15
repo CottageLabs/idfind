@@ -11,6 +11,7 @@ import logging
 import sys
 from time import sleep
 import requests
+from urllib2 import URLError
 
 from flask import url_for
 
@@ -88,6 +89,16 @@ package for the password.'''.format(config['TWITTER_CREDENTIALS_FILE'])
             lm = ids['hits']['hits'][0]['_source']['last_mention_id']
         
         return lm
+
+    def sturdy_listen(self):
+        '''Listen to tweet mentions, but don't balk on network errors
+        (just log them).'''
+
+        while True:
+            try:
+                self.listen()
+            except URLError:
+                log.warn('Network problem. Nvm, hopefully it will work later.')
         
     def listen(self):
         regex = re.compile(self.check_for, re.IGNORECASE)
@@ -159,7 +170,7 @@ def main(argv=None):
         argv = sys.argv
 
     x = TweetListen()
-    x.listen()
+    x.sturdy_listen()
 
 
 if __name__ == '__main__':
