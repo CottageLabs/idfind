@@ -98,7 +98,11 @@ package for the password.'''.format(config['TWITTER_CREDENTIALS_FILE'])
             try:
                 self.listen()
             except URLError:
+                # these are NOT all the network problem-related
+                # exceptions from all network libraries of course..
                 log.warn('Network problem. Nvm, hopefully it will work later.')
+            except Exception as e:
+                log.warn('Some problem has occurred. Original details: "{}"'.format(e))
         
     def listen(self):
         regex = re.compile(self.check_for, re.IGNORECASE)
